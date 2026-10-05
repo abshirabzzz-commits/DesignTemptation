@@ -11,32 +11,32 @@ export default function ProductsPage() {
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
       <Header />
 
-      <main className="flex-1 pt-32 pb-24">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 space-y-16">
+      <main className="flex-1 pt-22 sm:pt-30 lg:pt-32 pb-14 sm:pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 space-y-8 sm:space-y-12">
           <Link
             href="/#products"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#8C877E] hover:text-[#171615] transition-colors"
+            className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.2em] text-[#8C877E] hover:text-[#171615] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Homepage</span>
           </Link>
 
-          <div className="border-b border-[#ECE7DF] pb-8 space-y-3">
-            <p className="text-[11px] font-sans tracking-[0.25em] uppercase text-[#8C877E] font-medium">
+          <div className="border-b border-[#ECE7DF] pb-5 sm:pb-8 space-y-2 sm:space-y-3">
+            <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.25em] uppercase text-[#8C877E] font-medium">
               Curated Editions
             </p>
-            <h1 className="font-serif text-4xl sm:text-6xl text-[#171615] font-light">
-              OBJECTS & BESPOKE PIECES
+            <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-[#171615] font-light tracking-tight">
+              OBJECTS &amp; BESPOKE PIECES
             </h1>
-            <p className="max-w-xl text-sm sm:text-base text-[#5A5752] font-light leading-relaxed">
+            <p className="max-w-xl text-xs sm:text-base text-[#5A5752] font-light leading-relaxed">
               Limited production architectural furnishings, cast luminaires, and monolithic stone
               works designed by DESIGN TEMPTATION and crafted by master artisans.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             {PRODUCTS.map((product) => (
-              <div key={product.id} className="space-y-4">
+              <div key={product.id} className="bg-white border border-[#ECE7DF] p-3.5 sm:p-4 space-y-3 hover:border-[#171615]/30 transition-all duration-300">
                 <Link href={`/products/${product.slug}`} className="block relative aspect-square w-full bg-[#ECE7DF] overflow-hidden group">
                   <Image
                     src={product.image}
@@ -46,25 +46,25 @@ export default function ProductsPage() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </Link>
-                <div className="space-y-1 border-b border-[#ECE7DF] pb-4">
-                  <div className="flex items-baseline justify-between">
-                    <h2 className="font-serif text-xl text-[#171615] hover:text-[#5A5752] transition-colors">
+                <div className="space-y-1 pt-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <h2 className="font-serif text-base sm:text-lg text-[#171615] hover:text-[#5A5752] transition-colors">
                       <Link href={`/products/${product.slug}`}>{product.name}</Link>
                     </h2>
-                    <span className="text-sm text-[#8C877E] font-sans">{product.price}</span>
+                    <span className="text-xs sm:text-sm text-[#171615] font-semibold font-sans shrink-0">{product.price}</span>
                   </div>
-                  <p className="text-xs text-[#8C877E]">{product.category}</p>
-                  <p className="text-xs text-[#5A5752] pt-1">
+                  <p className="text-[10px] uppercase tracking-wider text-[#8C877E]">{product.category}</p>
+                  <p className="text-xs text-[#5A5752] pt-0.5">
                     {product.material} • {product.dimensions}
                   </p>
-                  <div className="pt-3">
+                  <div className="pt-2 border-t border-[#ECE7DF]/80">
                     <a
                       href={`mailto:${BRAND.email}?subject=Acquisition%20Inquiry%20-%20${encodeURIComponent(
                         product.name
                       )}`}
-                      className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.14em] font-medium text-[#171615] hover:text-[#8C877E]"
+                      className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.14em] font-medium text-[#171615] hover:text-[#8C877E] transition-colors"
                     >
-                      <span>Acquire / Commission Piece</span>
+                      <span>Acquire Piece</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
                   </div>

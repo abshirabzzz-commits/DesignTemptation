@@ -9,11 +9,11 @@ export function AboutPreview() {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <section id="studio" className="py-14 sm:py-18 lg:py-20 bg-[#FAF8F5] border-y border-[#ECE7DF]">
+    <section id="studio" className="py-12 sm:py-18 lg:py-20 bg-[#FAF8F5] border-y border-[#ECE7DF]">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-          {/* Left: Strong Studio / Atelier Image with priority loading & fallback */}
-          <div className="lg:col-span-6 relative aspect-[4/3] sm:aspect-[16/11] max-h-[360px] sm:max-h-none w-full overflow-hidden bg-[#ECE7DF]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-14 items-center">
+          {/* Left: Studio / Atelier Image with priority loading & fallback */}
+          <div className="lg:col-span-6 relative aspect-[4/3] sm:aspect-[16/11] max-h-[340px] sm:max-h-none w-full overflow-hidden bg-[#ECE7DF] border border-[#ECE7DF]">
             {!imageError ? (
               <Image
                 src="/images/studio/studio-atelier.jpg"
@@ -37,7 +37,7 @@ export function AboutPreview() {
           </div>
 
           {/* Right: Short Editorial Studio Teaser */}
-          <div className="lg:col-span-6 space-y-4 sm:space-y-5 lg:pl-4">
+          <div className="lg:col-span-6 space-y-3 sm:space-y-5 lg:pl-4">
             <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
               DESIGN TEMPTATION
             </p>
@@ -46,15 +46,15 @@ export function AboutPreview() {
               Thoughtful interiors and architecture shaped around how you live.
             </h2>
 
-            <p className="text-sm sm:text-base text-[#5A5752] font-light leading-relaxed max-w-lg">
+            <p className="text-xs sm:text-base text-[#5A5752] font-light leading-relaxed max-w-lg">
               Founded on architectural discipline, DESIGN TEMPTATION crafts bespoke private residences
               and curated environments through natural diurnal light, enduring materiality, and spatial clarity.
             </p>
 
-            <div className="pt-2">
+            <div className="pt-1 sm:pt-2">
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group"
+                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group"
               >
                 <span>Discover Our Studio</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

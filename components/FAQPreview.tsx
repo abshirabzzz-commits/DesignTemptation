@@ -29,16 +29,16 @@ export function FAQPreview() {
     <section
       id="faq"
       aria-labelledby="faq-preview-heading"
-      className="py-16 sm:py-20 bg-[#FAF8F5] border-t border-[#ECE7DF]"
+      className="py-12 sm:py-18 bg-[#FAF8F5] border-t border-[#ECE7DF]"
     >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      <div className="max-w-4xl mx-auto px-5 sm:px-8 space-y-8 sm:space-y-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-8 space-y-6 sm:space-y-8">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
           <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase font-semibold text-[#8C877E]">
             INQUIRIES & CLARITY
           </p>
@@ -49,35 +49,48 @@ export function FAQPreview() {
             Frequently Asked Questions
           </h2>
           <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
-            Answers to some common questions about our design process and services.
+            Answers to common queries regarding architectural scopes and commissions.
           </p>
         </div>
 
-        {/* 3 Accordion Questions */}
-        <div className="divide-y divide-[#ECE7DF] border-y border-[#ECE7DF]">
+        {/* Compact Accordion Questions */}
+        <div className="space-y-2.5 sm:space-y-3">
           {HOMEPAGE_FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
             const contentId = `faq-preview-panel-${faq.id}`;
             const buttonId = `faq-preview-btn-${faq.id}`;
 
             return (
-              <div key={faq.id} className="py-4 sm:py-5">
+              <div
+                key={faq.id}
+                className={`border transition-all duration-200 ${
+                  isOpen
+                    ? "bg-white border-[#171615]/40"
+                    : "bg-white/80 border-[#ECE7DF] hover:border-[#8C877E]/60"
+                }`}
+              >
                 <button
                   type="button"
                   id={buttonId}
                   aria-expanded={isOpen}
                   aria-controls={contentId}
                   onClick={() => toggle(index)}
-                  className="w-full min-h-[44px] flex items-center justify-between gap-4 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] px-1 transition-colors"
+                  className="w-full min-h-[44px] p-3 sm:p-4 flex items-center justify-between gap-3 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] cursor-pointer"
                 >
-                  <span className="font-serif text-base sm:text-lg text-[#171615] group-hover:text-[#5A5752] transition-colors">
+                  <span className="font-serif text-sm sm:text-base text-[#171615] group-hover:text-[#5A5752] transition-colors leading-snug">
                     {faq.question}
                   </span>
-                  <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full border border-[#ECE7DF] group-hover:border-[#171615] transition-colors">
+                  <span
+                    className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full border transition-colors ${
+                      isOpen
+                        ? "border-[#171615] bg-[#171615] text-[#FAF8F5]"
+                        : "border-[#ECE7DF] text-[#5A5752]"
+                    }`}
+                  >
                     <Plus
                       aria-hidden="true"
-                      className={`w-3.5 h-3.5 text-[#5A5752] transition-transform duration-200 ease-out ${
-                        isOpen ? "rotate-45 text-[#171615]" : ""
+                      className={`w-3 h-3 transition-transform duration-200 ease-out ${
+                        isOpen ? "rotate-45" : ""
                       }`}
                     />
                   </span>
@@ -87,11 +100,13 @@ export function FAQPreview() {
                   id={contentId}
                   role="region"
                   aria-labelledby={buttonId}
-                  className={`overflow-hidden transition-all duration-200 ease-out ${
-                    isOpen ? "max-h-96 opacity-100 pt-3 pb-2" : "max-h-0 opacity-0"
+                  className={`overflow-hidden transition-all duration-200 ease-out px-3 sm:px-4 ${
+                    isOpen
+                      ? "max-h-96 opacity-100 pb-3.5 pt-1 border-t border-[#ECE7DF]/60"
+                      : "max-h-0 opacity-0"
                   }`}
                 >
-                  <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed px-1 pr-6 sm:pr-10">
+                  <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>
@@ -100,11 +115,11 @@ export function FAQPreview() {
           })}
         </div>
 
-        {/* View All FAQs Link/Button */}
-        <div className="text-center pt-2">
+        {/* View All FAQs Secondary Action Button */}
+        <div className="text-center pt-1">
           <Link
             href="/faq"
-            className="inline-flex items-center gap-2.5 px-6 py-3 border border-[#171615] text-[#171615] text-xs uppercase tracking-[0.16em] font-medium hover:bg-[#171615] hover:text-[#FAF8F5] transition-all group"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#171615]/30 hover:border-[#171615] text-[#171615] text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium transition-all group active:scale-[0.98]"
           >
             <span>VIEW ALL FAQs</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

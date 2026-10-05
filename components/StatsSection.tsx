@@ -87,20 +87,12 @@ export function StatsSection() {
     <section
       ref={containerRef}
       aria-label="Studio Statistics & Milestones"
-      className="py-12 sm:py-16 bg-[#F7F5F0] border-y border-[#ECE7DF]"
+      className="py-8 sm:py-14 lg:py-16 bg-[#F7F5F0] border-y border-[#ECE7DF]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
         {/* Editorial layout: 4 columns single balanced row on desktop (lg:grid-cols-4), clean 2x2 grid on mobile without horizontal scrolling */}
         <div className="grid grid-cols-2 lg:grid-cols-4">
           {STATISTICS.map((stat, idx) => {
-            // Precise hair-line separators:
-            // Mobile (2x2):
-            // - idx 0: border-r border-b
-            // - idx 1: border-b
-            // - idx 2: border-r
-            // - idx 3: no borders
-            // Desktop (1x4):
-            // - border-r on all except last (idx 3), no border-b
             const isRightBorderMobile = idx % 2 === 0;
             const isBottomBorderMobile = idx < 2;
             const isRightBorderDesktop = idx < 3;
@@ -108,7 +100,7 @@ export function StatsSection() {
             return (
               <div
                 key={stat.id}
-                className={`py-6 sm:py-8 px-4 sm:px-6 text-center flex flex-col justify-center space-y-1.5 transition-colors duration-300 border-[#ECE7DF] ${
+                className={`py-4 sm:py-7 px-3 sm:px-6 text-center flex flex-col justify-center space-y-1 transition-colors duration-300 border-[#ECE7DF] ${
                   isRightBorderMobile ? "border-r" : ""
                 } ${isBottomBorderMobile ? "border-b" : ""} ${
                   isRightBorderDesktop ? "lg:border-r" : "lg:border-r-0"

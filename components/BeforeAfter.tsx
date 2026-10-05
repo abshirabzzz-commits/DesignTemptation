@@ -76,16 +76,16 @@ export function BeforeAfter({
     <section
       id="transformation"
       aria-label="Before and After Transformation"
-      className="py-14 sm:py-20 lg:py-24 bg-[#FAF8F5] border-b border-[#ECE7DF]"
+      className="py-12 sm:py-18 lg:py-22 bg-[#FAF8F5] border-b border-[#ECE7DF]"
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-8 space-y-8 sm:space-y-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 space-y-6 sm:space-y-8">
         {/* 2. Section Heading: Editorial Polish */}
-        <div className="space-y-2 border-b border-[#ECE7DF] pb-5">
+        <div className="space-y-1.5 border-b border-[#ECE7DF] pb-4">
           <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
             TRANSFORMATION
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2.5">
+            <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
               Before &amp; After
             </h2>
             <p className="max-w-md text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
@@ -196,7 +196,7 @@ export function BeforeAfter({
           <div className="shrink-0 pt-1 sm:pt-0">
             <Link
               href="/projects"
-              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group"
+              className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group"
             >
               <span>View All Projects</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />

@@ -24,13 +24,13 @@ export default function CalculatorPage() {
       <Header />
 
       {/* 2. Main Content */}
-      <main className="flex-1 pt-28 sm:pt-32 pb-20 sm:pb-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 space-y-10 sm:space-y-12">
+      <main className="flex-1 pt-22 sm:pt-30 lg:pt-32 pb-14 sm:pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 space-y-6 sm:space-y-10">
           {/* Breadcrumb / Back Link */}
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#8C877E] hover:text-[#171615] transition-colors group"
+              className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.2em] text-[#8C877E] hover:text-[#171615] transition-colors group"
             >
               <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
               <span>Back to Homepage</span>
@@ -38,16 +38,16 @@ export default function CalculatorPage() {
           </div>
 
           {/* Page Title & Subtitle */}
-          <div className="border-b border-[#ECE7DF] pb-8 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#171615] text-[#FAF8F5] text-[10px] tracking-[0.25em] uppercase font-medium">
+          <div className="border-b border-[#ECE7DF] pb-5 sm:pb-8 space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#171615] text-[#FAF8F5] text-[10px] tracking-[0.25em] uppercase font-medium">
               <Calculator className="w-3 h-3" />
               <span>Investment Estimation</span>
             </div>
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#171615] font-light tracking-tight">
+            <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-[#171615] font-light tracking-tight">
               Project Cost Calculator
             </h1>
-            <p className="max-w-2xl text-sm sm:text-base text-[#5A5752] font-light leading-relaxed">
-              Get a quick estimate based on your project requirements.
+            <p className="max-w-2xl text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+              Get an accurate estimate based on your project requirements and spatial scope.
             </p>
           </div>
 
