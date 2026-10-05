@@ -1,0 +1,128 @@
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import { STATISTICS } from "@/data/content";
+import { StatItem } from "@/types";
+
+function StatCounter({ stat, isInView }: { stat: StatItem; isInView: boolean }) {
+  const [count, setCount] = useState<number>(0);
+  const target = stat.numericValue ?? (parseInt(stat.value.replace(/\D/g, ""), 10) || 0);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    // Check prefers-reduced-motion
+    if (typeof window !== "undefined") {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReducedMotion) {
+        const id = requestAnimationFrame(() => setCount(target));
+        return () => cancelAnimationFrame(id);
+      }
+    }
+
+    let startTime: number | null = null;
+    let animationFrameId: number;
+    const duration = 1200; // 1.2s smooth count
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Cubic ease-out
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * target));
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
+        setCount(target);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [isInView, target]);
+
+  return (
+    <div className="flex items-baseline justify-center">
+      <span className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight tabular-nums">
+        {count}
+      </span>
+      <span className="font-serif text-xl sm:text-2xl lg:text-3xl text-[#8C877E] font-light ml-0.5">
+        {stat.suffix ?? "+"}
+      </span>
+    </div>
+  );
+}
+
+export function StatsSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <section
+      ref={containerRef}
+      aria-label="Studio Statistics & Milestones"
+      className="py-12 sm:py-16 bg-[#F7F5F0] border-y border-[#ECE7DF]"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
+        {/* Editorial layout: 4 columns single balanced row on desktop (lg:grid-cols-4), clean 2x2 grid on mobile without horizontal scrolling */}
+        <div className="grid grid-cols-2 lg:grid-cols-4">
+          {STATISTICS.map((stat, idx) => {
+            // Precise hair-line separators:
+            // Mobile (2x2):
+            // - idx 0: border-r border-b
+            // - idx 1: border-b
+            // - idx 2: border-r
+            // - idx 3: no borders
+            // Desktop (1x4):
+            // - border-r on all except last (idx 3), no border-b
+            const isRightBorderMobile = idx % 2 === 0;
+            const isBottomBorderMobile = idx < 2;
+            const isRightBorderDesktop = idx < 3;
+
+            return (
+              <div
+                key={stat.id}
+                className={`py-6 sm:py-8 px-4 sm:px-6 text-center flex flex-col justify-center space-y-1.5 transition-colors duration-300 border-[#ECE7DF] ${
+                  isRightBorderMobile ? "border-r" : ""
+                } ${isBottomBorderMobile ? "border-b" : ""} ${
+                  isRightBorderDesktop ? "lg:border-r" : "lg:border-r-0"
+                } lg:border-b-0`}
+              >
+                <StatCounter stat={stat} isInView={isInView} />
+                <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.2em] uppercase text-[#8C877E] font-medium leading-relaxed">
+                  {stat.label}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
