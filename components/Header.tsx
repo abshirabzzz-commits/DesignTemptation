@@ -153,9 +153,9 @@ export function Header() {
           <Link
             href="/contact"
             onClick={() => setMobileMenuOpen(false)}
-            className="w-full flex items-center justify-center px-6 py-3.5 text-xs font-medium tracking-[0.14em] uppercase text-[#FAF8F5] bg-[#171615] active:bg-[#32302D]"
+            className="w-full flex items-center justify-center h-11 px-6 text-xs font-semibold tracking-[0.16em] uppercase text-[#FAF8F5] bg-[#171615] hover:bg-[#32302D] active:scale-[0.98] transition-all"
           >
-            Start a Project
+            START A PROJECT
           </Link>
 
           <div className="space-y-1 text-xs text-[#8C877E] font-light text-center">

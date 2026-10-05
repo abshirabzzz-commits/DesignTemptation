@@ -22,9 +22,9 @@ export function ProjectsGallery({ initialProjects }: ProjectsGalleryProps) {
   }, [activeCategory, initialProjects]);
 
   return (
-    <div className="space-y-10 sm:space-y-12">
+    <div className="space-y-6 sm:space-y-10">
       {/* Category Filter Tabs (Minimal, editorial, non-oversized) */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 border-b border-[#ECE7DF] pb-4">
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 border-b border-[#ECE7DF] pb-3 sm:pb-4">
         {PROJECT_CATEGORIES.map((category) => {
           const isActive = activeCategory === category;
           const count =
@@ -39,7 +39,7 @@ export function ProjectsGallery({ initialProjects }: ProjectsGalleryProps) {
               key={category}
               type="button"
               onClick={() => setActiveCategory(category)}
-              className={`px-3.5 py-1.5 text-xs tracking-[0.14em] uppercase transition-all duration-200 cursor-pointer ${
+              className={`px-3 py-1.5 text-[11px] sm:text-xs tracking-[0.14em] uppercase transition-all duration-200 cursor-pointer ${
                 isActive
                   ? "bg-[#171615] text-[#FAF8F5] font-medium"
                   : "bg-transparent text-[#8C877E] hover:text-[#171615] hover:bg-[#ECE7DF]/50"
@@ -56,7 +56,7 @@ export function ProjectsGallery({ initialProjects }: ProjectsGalleryProps) {
 
       {/* Editorial Grid (Medium-sized, balanced 3-column / 2-column layout) */}
       {filteredProjects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 lg:gap-10 items-start">
           {filteredProjects.map((project, idx) => (
             <ProjectCard
               key={project.id}

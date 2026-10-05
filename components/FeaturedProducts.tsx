@@ -16,11 +16,11 @@ function FeaturedProductCard({ prod }: { prod: ProductItem }) {
     : prod.price;
 
   return (
-    <article className="group flex flex-col space-y-3.5">
+    <article className="group flex flex-col bg-white border border-[#ECE7DF] p-3 sm:p-4 hover:border-[#171615]/30 transition-all duration-300">
       {/* Product Visual Container with balanced aspect ratio */}
       <Link
         href={`/products/${prod.slug}`}
-        className="block relative aspect-[4/3] sm:aspect-[16/12] lg:aspect-[4/3] w-full overflow-hidden bg-[#ECE7DF] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615]"
+        className="block relative aspect-[4/3] w-full overflow-hidden bg-[#ECE7DF] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615]"
         aria-label={`View ${prod.name}`}
       >
         {hasImage ? (
@@ -34,15 +34,15 @@ function FeaturedProductCard({ prod }: { prod: ProductItem }) {
             onError={() => setHasError(true)}
           />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#F4F1EA] border border-[#ECE7DF]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#F4F1EA] border border-[#ECE7DF]">
             <span className="text-[10px] font-sans tracking-[0.2em] uppercase text-[#8C877E]">
               {prod.category}
             </span>
-            <span className="font-serif text-base text-[#171615] font-light pt-1">
+            <span className="font-serif text-sm sm:text-base text-[#171615] font-light pt-1">
               {prod.name}
             </span>
             {prod.material && (
-              <span className="text-[11px] text-[#8C877E] font-light pt-1 italic">
+              <span className="text-[10px] text-[#8C877E] font-light pt-0.5 italic">
                 {prod.material}
               </span>
             )}
@@ -51,7 +51,7 @@ function FeaturedProductCard({ prod }: { prod: ProductItem }) {
       </Link>
 
       {/* Product Metadata & Action */}
-      <div className="flex-1 flex flex-col justify-between space-y-3 pt-1 border-b border-[#ECE7DF] pb-4">
+      <div className="flex-1 flex flex-col justify-between space-y-2.5 pt-3">
         <div className="space-y-1">
           {/* Category */}
           <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.2em] uppercase text-[#8C877E] font-medium">
@@ -59,21 +59,21 @@ function FeaturedProductCard({ prod }: { prod: ProductItem }) {
           </p>
 
           {/* Product Name */}
-          <h3 className="font-serif text-lg sm:text-xl text-[#171615] font-light group-hover:text-[#5A5752] transition-colors leading-snug">
+          <h3 className="font-serif text-base sm:text-lg text-[#171615] font-light group-hover:text-[#5A5752] transition-colors leading-snug">
             <Link href={`/products/${prod.slug}`}>{prod.name}</Link>
           </h3>
         </div>
 
         {/* Price & View Action */}
-        <div className="flex items-baseline justify-between pt-1">
-          <span className="font-sans text-sm sm:text-base font-medium text-[#171615] tracking-wide tabular-nums">
+        <div className="flex items-center justify-between pt-2 border-t border-[#ECE7DF]/80">
+          <span className="font-sans text-sm sm:text-base font-semibold text-[#171615] tracking-wide tabular-nums">
             {displayPrice}
           </span>
           <Link
             href={`/products/${prod.slug}`}
-            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] font-medium text-[#171615] group-hover:text-[#5A5752] transition-colors py-1"
+            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] group-hover:text-[#5A5752] transition-colors py-1"
           >
-            <span>View Product</span>
+            <span>View</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
         </div>
@@ -94,26 +94,26 @@ export function FeaturedProducts() {
     <section
       id="products"
       aria-label="Studio Collection & Featured Products"
-      className="py-14 sm:py-20 lg:py-24 bg-[#FAF8F5] border-b border-[#ECE7DF]"
+      className="py-12 sm:py-18 lg:py-22 bg-[#FAF8F5] border-b border-[#ECE7DF]"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 space-y-10 sm:space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 space-y-8 sm:space-y-10">
         {/* Section Heading */}
-        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-[#ECE7DF] pb-5">
-          <div className="space-y-1.5 max-w-xl">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-[#ECE7DF] pb-4">
+          <div className="space-y-1 max-w-xl">
             <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
               STUDIO COLLECTION
             </p>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
+            <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
               Featured Products
             </h2>
-            <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed pt-1">
+            <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed pt-0.5">
               Thoughtfully selected pieces to complement considered interiors.
             </p>
           </div>
 
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#8C877E] transition-colors group self-start sm:self-auto py-1"
+            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors group self-start sm:self-auto py-1"
           >
             <span>Explore Products</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -121,19 +121,19 @@ export function FeaturedProducts() {
         </div>
 
         {/* 3-Column Desktop Grid / 1-Column Mobile Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {featuredProducts.map((prod) => (
             <FeaturedProductCard key={prod.id} prod={prod} />
           ))}
         </div>
 
-        {/* Bottom CTA Link (Subtle) */}
+        {/* Bottom CTA Link (Subtle secondary button) */}
         <div className="text-center pt-2">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-2 group"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#171615]/30 hover:border-[#171615] text-[#171615] text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium transition-all group active:scale-[0.98]"
           >
-            <span>Explore Products</span>
+            <span>Explore Complete Collection</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
         </div>
