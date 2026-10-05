@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1002,
+    "full_name": "abshhhhhhhr",
+    "email": "bnms@gmail.com",
+    "phone": "7888884545",
+    "project_type": "Other",
+    "property_type": "Other",
+    "project_location": "kolkata",
+    "project_area": 40.5,
+    "budget_range": "Below ₹5 Lakhs",
+    "requirements": "fgvbdnjakdnxjqnxhbxhbx",
+    "reference_images": null,
+    "status": "New",
+    "created_at": "2026-10-04T16:32:42.547Z"
+  },
+  {
+    "id": 1001,
+    "full_name": "Vikram Aditya",
+    "email": "vikram.aditya@example.com",
+    "phone": "+91 98450 12345",
+    "project_type": "Architecture",
+    "property_type": "Villa",
+    "project_location": "Whitefield, Bengaluru",
+    "project_area": 4500,
+    "budget_range": "?50 Lakhs+",
+    "requirements": "Architectural planning and turnkey structural design for contemporary residence.",
+    "reference_images": null,
+    "status": "New",
+    "created_at": "2026-10-04T09:04:36.570Z"
+  }
+]
