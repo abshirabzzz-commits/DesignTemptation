@@ -14,16 +14,16 @@ export function CalculatorCTA() {
 
           {/* Left Content */}
           <div className="relative z-10 max-w-xl space-y-2 sm:space-y-3">
-            <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.25em] uppercase text-[#DFD9CF]/70 font-medium">
+            <div className="inline-flex items-center gap-2 text-xs sm:text-[11px] tracking-[0.22em] sm:tracking-[0.25em] uppercase text-[#DFD9CF]/70 font-medium">
               <Calculator className="w-3.5 h-3.5 text-[#DFD9CF]" />
               <span>Cost Estimator</span>
             </div>
 
-            <h2 className="font-serif text-xl sm:text-3xl lg:text-4xl font-light text-[#FAF8F5] tracking-tight">
+            <h2 className="font-serif text-[31px] sm:text-3xl lg:text-4xl font-light text-[#FAF8F5] tracking-tight">
               Plan Your Project
             </h2>
 
-            <p className="text-xs sm:text-sm text-[#DFD9CF]/80 font-light leading-relaxed">
+            <p className="text-[15.5px] sm:text-sm text-[#DFD9CF]/80 font-light leading-relaxed">
               Get an accurate estimate based on your project type, area and design preferences.
             </p>
           </div>
@@ -32,7 +32,7 @@ export function CalculatorCTA() {
           <div className="relative z-10 shrink-0 pt-1 md:pt-0">
             <Link
               href="/calculator"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-11 px-6 bg-[#FAF8F5] text-[#171615] text-xs font-semibold uppercase tracking-[0.16em] hover:bg-white active:bg-[#ECE7DF] active:scale-[0.98] transition-all group"
+              className="w-full sm:w-auto btn-primary-light group text-[14px] sm:text-xs tracking-wider uppercase font-semibold !h-12 sm:!h-11 justify-center"
             >
               <span>CALCULATE ESTIMATE</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

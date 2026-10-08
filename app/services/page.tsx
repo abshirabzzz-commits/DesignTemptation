@@ -1,10 +1,41 @@
 import React from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SERVICES } from "@/data/content";
+
+export const metadata: Metadata = {
+  title: "Services",
+  description:
+    "Comprehensive interior design, architecture, and turnkey execution services tailored for private residences, villas, and commercial commissions in Bengaluru.",
+  alternates: {
+    canonical: "/services",
+  },
+  openGraph: {
+    title: "Services | DESIGN TEMPTATION",
+    description:
+      "Comprehensive interior design, architecture, and turnkey execution services tailored for private residences, villas, and commercial commissions in Bengaluru.",
+    url: "/services",
+    images: [
+      {
+        url: "/images/services/service-residential.jpg",
+        width: 1600,
+        height: 1100,
+        alt: "DESIGN TEMPTATION Interior Design & Architecture Services",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Services | DESIGN TEMPTATION",
+    description:
+      "Comprehensive interior design, architecture, and turnkey execution services tailored for private residences, villas, and commercial commissions in Bengaluru.",
+    images: ["/images/services/service-residential.jpg"],
+  },
+};
 
 export default function ServicesPage() {
   return (
@@ -105,7 +136,7 @@ export default function ServicesPage() {
                   <div className="pt-4">
                     <Link
                       href="/contact"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-[#171615] text-[#FAF8F5] text-xs uppercase tracking-[0.14em] font-medium hover:bg-[#32302D] transition-colors group"
+                      className="btn-primary group"
                     >
                       <span>Enquire Regarding {service.title}</span>
                       <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -117,7 +148,7 @@ export default function ServicesPage() {
           </div>
 
           {/* Bottom Commissioning Banner */}
-          <div className="bg-[#F4F1EA] p-8 sm:p-12 border border-[#ECE7DF] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="bg-[#F4F1EA] p-6 sm:p-10 lg:p-12 border border-[#ECE7DF] flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
               <h3 className="font-serif text-2xl text-[#171615]">Looking for a bespoke scope?</h3>
               <p className="text-xs sm:text-sm text-[#5A5752] font-light">
@@ -126,10 +157,10 @@ export default function ServicesPage() {
             </div>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#171615] text-[#FAF8F5] text-xs font-medium uppercase tracking-[0.16em] hover:bg-[#32302D] transition-colors shrink-0"
+              className="btn-primary group shrink-0"
             >
               <span>Commence A Dialogue</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>

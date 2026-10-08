@@ -38,15 +38,15 @@ export function AboutPreview() {
 
           {/* Right: Short Editorial Studio Teaser */}
           <div className="lg:col-span-6 space-y-3 sm:space-y-5 lg:pl-4">
-            <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
+            <p className="text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.28em] uppercase text-[#8C877E] font-medium">
               DESIGN TEMPTATION
             </p>
 
-            <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-[#171615] leading-[1.2] tracking-tight">
+            <h2 className="font-serif text-[31px] sm:text-3xl lg:text-4xl font-light text-[#171615] leading-[1.15] sm:leading-[1.2] tracking-tight">
               Thoughtful interiors and architecture shaped around how you live.
             </h2>
 
-            <p className="text-xs sm:text-base text-[#5A5752] font-light leading-relaxed max-w-lg">
+            <p className="text-[15.5px] sm:text-base text-[#5A5752] font-light leading-relaxed max-w-lg">
               Founded on architectural discipline, DESIGN TEMPTATION crafts bespoke private residences
               and curated environments through natural diurnal light, enduring materiality, and spatial clarity.
             </p>
@@ -54,7 +54,7 @@ export function AboutPreview() {
             <div className="pt-1 sm:pt-2">
               <Link
                 href="/about"
-                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group"
+                className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs uppercase tracking-[0.16em] font-semibold sm:font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1.5 min-h-[42px] sm:min-h-0 group"
               >
                 <span>Discover Our Studio</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

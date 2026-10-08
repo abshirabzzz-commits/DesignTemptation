@@ -39,14 +39,14 @@ export function ProjectsGallery({ initialProjects }: ProjectsGalleryProps) {
               key={category}
               type="button"
               onClick={() => setActiveCategory(category)}
-              className={`px-3 py-1.5 text-[11px] sm:text-xs tracking-[0.14em] uppercase transition-all duration-200 cursor-pointer ${
+              className={`px-3.5 py-2 text-xs sm:text-xs tracking-[0.14em] uppercase transition-all duration-200 cursor-pointer min-h-[42px] flex items-center focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] ${
                 isActive
                   ? "bg-[#171615] text-[#FAF8F5] font-medium"
                   : "bg-transparent text-[#8C877E] hover:text-[#171615] hover:bg-[#ECE7DF]/50"
               }`}
             >
               <span>{category}</span>
-              <span className={`ml-1.5 text-[10px] ${isActive ? "text-[#FAF8F5]/70" : "text-[#8C877E]"}`}>
+              <span className={`ml-1.5 text-xs sm:text-[10px] ${isActive ? "text-[#FAF8F5]/70" : "text-[#8C877E]"}`}>
                 ({count})
               </span>
             </button>

@@ -34,7 +34,7 @@ export function StudioSection() {
               </h2>
             </div>
 
-            <div className="space-y-5 text-sm sm:text-base text-[#5A5752] font-light leading-relaxed">
+            <div className="space-y-5 text-[15.5px] sm:text-base text-[#5A5752] font-light leading-relaxed">
               <p>
                 At DESIGN TEMPTATION, we believe true luxury is quiet. It lives in the unhurried
                 dialogue between structural clarity, honest materiality, and the choreography of
@@ -42,7 +42,7 @@ export function StudioSection() {
               </p>
               <p>
                 Founded on architectural rigor, our studio conceives private residential
-                villas and bespoke environments globally. We bypass fleeting trends in pursuit of
+                villas and bespoke environments with architectural discipline. We bypass fleeting trends in pursuit of
                 spaces that feel timeless on the day of completion—and even richer twenty years
                 later.
               </p>
@@ -51,17 +51,17 @@ export function StudioSection() {
             <div className="pt-2">
               <a
                 href="#philosophy"
-                className="inline-flex items-center gap-3 px-7 py-3.5 bg-[#171615] text-[#FAF8F5] text-xs font-medium uppercase tracking-[0.14em] hover:bg-[#32302D] transition-colors group"
+                className="btn-primary group"
               >
                 <span>Discover the Studio</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </a>
             </div>
 
             {/* Subtle Atelier Key Facts */}
             <div className="grid grid-cols-2 gap-6 pt-6 border-t border-[#ECE7DF]">
               <div>
-                <span className="text-[10px] tracking-[0.2em] uppercase text-[#8C877E] block mb-1">
+                <span className="text-[11px] tracking-[0.2em] uppercase text-[#8C877E] block mb-1">
                   Discipline
                 </span>
                 <span className="font-serif text-lg text-[#171615]">
@@ -69,7 +69,7 @@ export function StudioSection() {
                 </span>
               </div>
               <div>
-                <span className="text-[10px] tracking-[0.2em] uppercase text-[#8C877E] block mb-1">
+                <span className="text-[11px] tracking-[0.2em] uppercase text-[#8C877E] block mb-1">
                   Studio Location
                 </span>
                 <span className="font-serif text-lg text-[#171615]">

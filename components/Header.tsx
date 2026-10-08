@@ -40,7 +40,7 @@ export function Header() {
             : ""
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 sm:h-[68px] flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-[68px] sm:h-[68px] flex items-center justify-between">
           {/* Brand Identity Block: [Logo Icon] | DESIGN TEMPTATION / INTERIORS & ARCHITECTURE */}
           <Link
             href="/"
@@ -48,30 +48,30 @@ export function Header() {
             aria-label="DESIGN TEMPTATION - INTERIORS & ARCHITECTURE - Homepage"
           >
             {/* Official Logo: uploaded asset, natural blend, no background box */}
-            <div className="relative flex items-center justify-center shrink-0 overflow-hidden w-[34px] sm:w-[40px] lg:w-[42px] h-[36px] sm:h-[42px] lg:h-[44px]">
+            <div className="relative flex items-center justify-center shrink-0 w-[36px] sm:w-[38px] lg:w-[40px] h-[32px] sm:h-[34px] lg:h-[36px]">
               <Image
                 src={BRAND.logo}
                 alt="DESIGN TEMPTATION"
-                width={1024}
-                height={383}
+                width={354}
+                height={297}
                 priority
-                className="h-full w-auto max-w-none object-contain shrink-0"
+                className="w-full h-full object-contain shrink-0"
               />
             </div>
 
-            {/* Thin subtle vertical divider: tightly spaced (18-24px from logo, 16-22px to text) */}
+            {/* Thin subtle vertical divider: tightly spaced */}
             <div
-              className="h-6 sm:h-7 w-[1px] bg-[#DFD9CF] shrink-0 self-center ml-4 sm:ml-5 mr-3.5 sm:mr-4.5"
+              className="h-6.5 sm:h-7 w-[1px] bg-[#DFD9CF] shrink-0 self-center ml-2.5 sm:ml-4 mr-2.5 sm:mr-4"
               aria-hidden="true"
             />
 
             {/* Brand Text Block */}
             <div className="flex flex-col justify-center select-none">
-              <span className="font-sans text-[12px] sm:text-[13.5px] lg:text-[14px] font-semibold tracking-[0.16em] sm:tracking-[0.18em] uppercase text-[#171615] leading-[1.15]">
+              <span className="font-sans text-[14px] sm:text-[14px] font-semibold tracking-[0.14em] sm:tracking-[0.18em] uppercase text-[#171615] leading-[1.12]">
                 DESIGN TEMPTATION
               </span>
-              <span className="font-sans text-[7.5px] sm:text-[8.5px] lg:text-[9px] font-medium tracking-[0.24em] sm:tracking-[0.26em] uppercase text-[#8C877E] leading-tight pt-0.5 sm:pt-1">
-                INTERIORS & ARCHITECTURE
+              <span className="font-sans text-[11px] sm:text-[8.5px] lg:text-[9px] font-medium tracking-[0.18em] sm:tracking-[0.24em] uppercase text-[#8C877E] leading-tight pt-0.5 sm:pt-1">
+                INTERIORS &amp; ARCHITECTURE
               </span>
             </div>
           </Link>
@@ -96,9 +96,9 @@ export function Header() {
           <div className="hidden md:flex items-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center h-[38px] px-4.5 lg:px-5 text-[11px] font-medium tracking-[0.14em] uppercase text-[#FAF8F5] bg-[#171615] hover:bg-[#32302D] active:scale-[0.99] transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615]"
+              className="btn-primary !h-[38px] !min-h-[38px] !px-4.5 lg:!px-5 text-[11px] font-semibold tracking-[0.14em]"
             >
-              Start a Project
+              START A PROJECT
             </Link>
           </div>
 
@@ -106,15 +106,15 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 -mr-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#171615] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] active:scale-95 transition-transform"
+            className="md:hidden p-2.5 -mr-1.5 min-h-[48px] min-w-[48px] flex items-center justify-center text-[#171615] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] active:scale-95 transition-transform cursor-pointer"
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
             {mobileMenuOpen ? (
-              <X className="w-5 h-5 stroke-[1.5]" />
+              <X className="w-7 h-7 stroke-[2]" />
             ) : (
-              <Menu className="w-5 h-5 stroke-[1.5]" />
+              <Menu className="w-7 h-7 stroke-[2]" />
             )}
           </button>
         </div>
@@ -123,7 +123,7 @@ export function Header() {
       {/* Mobile Navigation Drawer */}
       <div
         id="mobile-navigation"
-        className={`fixed inset-0 z-40 bg-[#FAF8F5] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:hidden flex flex-col justify-between pt-20 pb-8 px-6 overflow-y-auto ${
+        className={`fixed inset-0 z-40 bg-[#FAF8F5] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:hidden flex flex-col justify-between pt-22 pb-8 px-6 overflow-y-auto ${
           mobileMenuOpen
             ? "opacity-100 pointer-events-auto translate-y-0"
             : "opacity-0 pointer-events-none -translate-y-4"
@@ -131,19 +131,19 @@ export function Header() {
         aria-hidden={!mobileMenuOpen}
       >
         <div className="space-y-6 pt-2">
-          <p className="text-[10px] tracking-[0.25em] text-[#8C877E] uppercase font-medium">
+          <p className="text-[11px] tracking-[0.25em] text-[#8C877E] uppercase font-semibold">
             Navigation
           </p>
-          <nav className="flex flex-col space-y-2.5" aria-label="Mobile Navigation">
+          <nav className="flex flex-col space-y-2" aria-label="Mobile Navigation">
             {MOBILE_NAV_ITEMS.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="font-serif text-xl sm:text-2xl text-[#171615] hover:text-[#8C877E] transition-colors duration-200 flex items-center justify-between py-1.5 border-b border-[#ECE7DF]/60"
+                className="font-serif text-xl sm:text-2xl text-[#171615] hover:text-[#8C877E] transition-colors duration-200 flex items-center justify-between py-2 border-b border-[#ECE7DF]/70"
               >
                 <span>{item.label}</span>
-                <ArrowUpRight className="w-4 h-4 text-[#8C877E] stroke-[1.25]" />
+                <ArrowUpRight className="w-4 h-4 text-[#8C877E] stroke-[1.5]" />
               </Link>
             ))}
           </nav>
@@ -153,7 +153,7 @@ export function Header() {
           <Link
             href="/contact"
             onClick={() => setMobileMenuOpen(false)}
-            className="w-full flex items-center justify-center h-11 px-6 text-xs font-semibold tracking-[0.16em] uppercase text-[#FAF8F5] bg-[#171615] hover:bg-[#32302D] active:scale-[0.98] transition-all"
+            className="btn-primary w-full !h-12 text-xs font-semibold tracking-[0.16em]"
           >
             START A PROJECT
           </Link>

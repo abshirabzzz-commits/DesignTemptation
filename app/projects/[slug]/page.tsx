@@ -8,6 +8,8 @@ import { PROJECTS, getProjectBySlug } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+import { SITE_URL } from "@/lib/site";
+
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -26,19 +28,19 @@ export async function generateMetadata({
 
   if (!project) {
     return {
-      title: "Project Not Found | DESIGN TEMPTATION",
+      title: "Project Not Found",
     };
   }
 
   const metaDescription =
     project.shortDescription ||
     project.description ||
-    `${project.title} - An architectural and interior design project by DESIGN TEMPTATION.`;
+    `${project.title} — Architectural and interior design commission in ${project.location} by DESIGN TEMPTATION.`;
 
   const coverImg = project.coverImage || project.image;
 
   return {
-    title: `${project.title} | DESIGN TEMPTATION`,
+    title: project.title,
     description: metaDescription,
     openGraph: {
       title: `${project.title} | DESIGN TEMPTATION`,
@@ -49,9 +51,15 @@ export async function generateMetadata({
           url: coverImg,
           width: 1600,
           height: 1100,
-          alt: project.title,
+          alt: project.imageAlt || project.title,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} | DESIGN TEMPTATION`,
+      description: metaDescription,
+      images: [coverImg],
     },
     alternates: {
       canonical: `/projects/${project.slug}`,
@@ -75,8 +83,31 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   // Discover other related projects (excluding current)
   const otherProjects = PROJECTS.filter((p) => p.slug !== project.slug).slice(0, 3);
 
+  const projectSchema = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    headline: project.title,
+    description: project.shortDescription || project.description,
+    image: `${SITE_URL}${coverImg}`,
+    genre: project.category,
+    locationCreated: {
+      "@type": "Place",
+      name: project.location,
+    },
+    creator: {
+      "@type": "Organization",
+      name: "DESIGN TEMPTATION",
+      url: SITE_URL,
+    },
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectSchema) }}
+      />
       <Header />
 
       <main className="flex-1 pt-28 sm:pt-32 pb-24">
@@ -106,7 +137,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               <span>{project.year}</span>
             </div>
 
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#171615] font-light leading-[1.1] tracking-tight">
+            <h1 className="font-serif text-[32px] sm:text-5xl lg:text-6xl text-[#171615] font-light leading-[1.1] tracking-tight">
               {project.title}
             </h1>
 
@@ -132,7 +163,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           {/* 9. Relevant Project Information Metadata Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-y border-[#ECE7DF] bg-[#FAF8F5]">
             <div className="space-y-1">
-              <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
+              <p className="text-[11px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
                 Location
               </p>
               <p className="font-serif text-base sm:text-lg text-[#171615] font-light">
@@ -141,7 +172,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             </div>
 
             <div className="space-y-1">
-              <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
+              <p className="text-[11px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
                 Category
               </p>
               <p className="font-serif text-base sm:text-lg text-[#171615] font-light">
@@ -150,7 +181,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             </div>
 
             <div className="space-y-1">
-              <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
+              <p className="text-[11px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
                 Property Type
               </p>
               <p className="font-serif text-base sm:text-lg text-[#171615] font-light">
@@ -159,7 +190,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             </div>
 
             <div className="space-y-1">
-              <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
+              <p className="text-[11px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
                 Built-Up Area / Year
               </p>
               <p className="font-serif text-base sm:text-lg text-[#171615] font-light">

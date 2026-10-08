@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ProjectShowcase } from "@/components/ProjectShowcase";
@@ -12,6 +13,15 @@ import { FAQPreview } from "@/components/FAQPreview";
 import { FinalCTA } from "@/components/FinalCTA";
 import { MovingReviews } from "@/components/MovingReviews";
 import { Footer } from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "DESIGN TEMPTATION | Interiors & Architecture",
+  description:
+    "Interior design and architecture studio in Bengaluru shaping thoughtful residential and commercial spaces through light, materiality, and turnkey execution.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default function Home() {
   return (

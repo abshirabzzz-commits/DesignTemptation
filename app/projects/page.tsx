@@ -8,9 +8,12 @@ import { PROJECTS } from "@/data/content";
 import { ProjectsGallery } from "@/components/ProjectsGallery";
 
 export const metadata: Metadata = {
-  title: "Our Projects | DESIGN TEMPTATION",
+  title: "Our Projects",
   description:
     "A selection of spaces shaped through thoughtful design, material, light and functionality. Explore residential, architectural, and turnkey commissions by DESIGN TEMPTATION.",
+  alternates: {
+    canonical: "/projects",
+  },
   openGraph: {
     title: "Our Projects | DESIGN TEMPTATION",
     description:
@@ -24,6 +27,13 @@ export const metadata: Metadata = {
         alt: "DESIGN TEMPTATION Architectural Portfolio",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Projects | DESIGN TEMPTATION",
+    description:
+      "A selection of spaces shaped through thoughtful design, material, light and functionality.",
+    images: ["/images/projects/project-01-horizontal.jpg"],
   },
 };
 
