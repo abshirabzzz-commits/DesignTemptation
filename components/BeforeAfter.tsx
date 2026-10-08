@@ -81,14 +81,14 @@ export function BeforeAfter({
       <div className="max-w-5xl mx-auto px-4 sm:px-8 space-y-6 sm:space-y-8">
         {/* 2. Section Heading: Editorial Polish */}
         <div className="space-y-1.5 border-b border-[#ECE7DF] pb-4">
-          <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
+          <p className="text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.28em] uppercase text-[#8C877E] font-medium">
             TRANSFORMATION
           </p>
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2.5">
-            <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
+            <h2 className="font-serif text-[32px] sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
               Before &amp; After
             </h2>
-            <p className="max-w-md text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+            <p className="max-w-md text-[15.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed">
               See how thoughtful planning, material selection and design transform a space.
             </p>
           </div>
@@ -129,7 +129,7 @@ export function BeforeAfter({
                 </div>
               )}
               {/* AFTER Label - stays visible in top-right */}
-              <div className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 px-2.5 py-1 bg-[#171615]/85 backdrop-blur-[2px] text-[10px] font-sans tracking-[0.2em] uppercase text-[#FAF8F5] pointer-events-none z-10">
+              <div className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 px-2.5 py-1 bg-[#171615]/85 backdrop-blur-[2px] text-[11px] sm:text-[10px] font-sans tracking-[0.2em] uppercase text-[#FAF8F5] pointer-events-none z-10">
                 AFTER
               </div>
             </div>
@@ -157,7 +157,7 @@ export function BeforeAfter({
                 </div>
               )}
               {/* BEFORE Label - stays visible in top-left */}
-              <div className="absolute top-3.5 left-3.5 sm:top-4 sm:left-4 px-2.5 py-1 bg-[#FAF8F5]/90 backdrop-blur-[2px] text-[10px] font-sans tracking-[0.2em] uppercase text-[#171615] pointer-events-none z-10">
+              <div className="absolute top-3.5 left-3.5 sm:top-4 sm:left-4 px-2.5 py-1 bg-[#FAF8F5]/90 backdrop-blur-[2px] text-[11px] sm:text-[10px] font-sans tracking-[0.2em] uppercase text-[#171615] pointer-events-none z-10">
                 BEFORE
               </div>
             </div>
@@ -174,7 +174,7 @@ export function BeforeAfter({
           </div>
 
           {/* Understated Interaction Prompt */}
-          <p className="text-center text-[10px] sm:text-[11px] text-[#8C877E] tracking-wider font-light">
+          <p className="text-center text-[12px] sm:text-[11px] text-[#8C877E] tracking-wider font-light">
             Drag slider or use arrow keys to inspect the architectural transformation
           </p>
         </div>
@@ -182,12 +182,12 @@ export function BeforeAfter({
         {/* 6. Desktop & Mobile Project Information (Positioned below the visual) */}
         <div className="pt-2 border-t border-[#ECE7DF] flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
           <div className="space-y-1.5 max-w-xl">
-            <div className="flex items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#8C877E] font-medium">
+            <div className="flex items-center gap-2 text-xs sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#8C877E] font-medium">
               <span>{projectName}</span>
               <span>•</span>
               <span>{location}</span>
             </div>
-            <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+            <p className="text-[14.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed">
               {description}
             </p>
           </div>
@@ -196,7 +196,7 @@ export function BeforeAfter({
           <div className="shrink-0 pt-1 sm:pt-0">
             <Link
               href="/projects"
-              className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group"
+              className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs uppercase tracking-[0.16em] font-semibold sm:font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1.5 min-h-[40px] sm:min-h-0 group"
             >
               <span>View All Projects</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />

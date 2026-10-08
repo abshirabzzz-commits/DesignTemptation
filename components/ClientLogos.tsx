@@ -7,7 +7,7 @@ export function ClientLogos() {
   return (
     <section className="py-8 sm:py-10 bg-[#FAF8F5] border-b border-[#ECE7DF]">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <p className="text-center text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase font-semibold text-[#8C877E] mb-6">
+        <p className="text-center text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.28em] uppercase font-semibold text-[#8C877E] mb-6">
           SELECTED CLIENTS
         </p>
 
@@ -18,10 +18,10 @@ export function ClientLogos() {
               key={client.id}
               className="text-center group py-1"
             >
-              <span className="font-serif text-xs sm:text-sm tracking-[0.18em] text-[#32302D] uppercase group-hover:text-[#171615] transition-colors whitespace-nowrap">
+              <span className="font-serif text-[13px] sm:text-sm tracking-[0.18em] text-[#32302D] uppercase group-hover:text-[#171615] transition-colors whitespace-nowrap">
                 {client.name}
               </span>
-              <span className="block text-[8px] sm:text-[9px] font-sans tracking-widest text-[#8C877E] uppercase pt-0.5">
+              <span className="block text-[11px] sm:text-[9.5px] font-sans tracking-widest text-[#8C877E] uppercase pt-0.5">
                 {client.category}
               </span>
             </div>

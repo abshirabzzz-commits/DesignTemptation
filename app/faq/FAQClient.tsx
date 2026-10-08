@@ -58,7 +58,7 @@ export function FAQClient({ faqs }: FAQClientProps) {
       </div>
 
       {/* Accordion Questions List */}
-      <div className="space-y-3">
+      <div className="space-y-3 sm:space-y-3.5">
         {filteredFaqs.map((faq) => {
           const isOpen = openId === faq.id;
           const contentId = `faq-full-panel-${faq.id}`;
@@ -69,8 +69,8 @@ export function FAQClient({ faqs }: FAQClientProps) {
               key={faq.id}
               className={`border transition-all duration-200 ${
                 isOpen
-                  ? "bg-white border-[#171615]/40"
-                  : "bg-white/80 border-[#ECE7DF] hover:border-[#8C877E]/60"
+                  ? "bg-white border-[#171615]/50 shadow-[0_4px_16px_rgba(23,22,21,0.04)]"
+                  : "bg-white border-[#ECE7DF] hover:border-[#8C877E]/60 shadow-[0_1px_4px_rgba(0,0,0,0.02)]"
               }`}
             >
               <button
@@ -79,22 +79,28 @@ export function FAQClient({ faqs }: FAQClientProps) {
                 aria-expanded={isOpen}
                 aria-controls={contentId}
                 onClick={() => toggle(faq.id)}
-                className="w-full min-h-[44px] p-3.5 sm:p-5 flex items-start sm:items-center justify-between gap-4 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] cursor-pointer"
+                className="w-full min-h-[50px] p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] cursor-pointer"
               >
                 <div className="space-y-1 pr-2">
-                  <span className="block text-[10px] font-sans tracking-[0.2em] uppercase text-[#8C877E] font-medium">
+                  <span className="block text-xs sm:text-[10px] font-sans tracking-[0.18em] sm:tracking-[0.2em] uppercase text-[#8C877E] font-medium">
                     {faq.category}
                   </span>
-                  <span className="block font-serif text-base sm:text-xl text-[#171615] font-light group-hover:text-[#5A5752] transition-colors">
+                  <span
+                    className={`block font-serif text-[18px] sm:text-xl transition-colors leading-snug ${
+                      isOpen
+                        ? "text-[#171615] font-normal"
+                        : "text-[#171615] font-light group-hover:text-[#5A5752]"
+                    }`}
+                  >
                     {faq.question}
                   </span>
                 </div>
 
                 <span
-                  className={`shrink-0 mt-1 sm:mt-0 flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border transition-colors ${
+                  className={`shrink-0 mt-1 sm:mt-0 flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border transition-all duration-200 ${
                     isOpen
                       ? "border-[#171615] bg-[#171615] text-[#FAF8F5]"
-                      : "border-[#ECE7DF] text-[#5A5752]"
+                      : "border-[#ECE7DF] text-[#5A5752] group-hover:border-[#8C877E]"
                   }`}
                 >
                   <Plus
@@ -110,13 +116,13 @@ export function FAQClient({ faqs }: FAQClientProps) {
                 id={contentId}
                 role="region"
                 aria-labelledby={buttonId}
-                className={`overflow-hidden transition-all duration-200 ease-out px-3.5 sm:px-5 ${
+                className={`overflow-hidden transition-all duration-200 ease-out px-4 sm:px-5 ${
                   isOpen
-                    ? "max-h-96 opacity-100 pb-4 pt-1 border-t border-[#ECE7DF]/60"
+                    ? "max-h-96 opacity-100 pb-4 pt-2 border-t border-[#ECE7DF]"
                     : "max-h-0 opacity-0"
                 }`}
               >
-                <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed max-w-3xl">
+                <p className="text-[14.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed max-w-3xl">
                   {faq.answer}
                 </p>
               </div>
@@ -128,14 +134,14 @@ export function FAQClient({ faqs }: FAQClientProps) {
       {/* Atelier Consultation Inquiry Prompt */}
       <div className="p-6 sm:p-10 bg-[#F4F1EA] border border-[#ECE7DF] flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
         <div className="space-y-1.5 max-w-xl">
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#8C877E] font-medium">
+          <div className="flex items-center gap-2 text-xs sm:text-[10px] uppercase tracking-[0.22em] sm:tracking-[0.25em] text-[#8C877E] font-medium">
             <Sparkles className="w-3.5 h-3.5 text-[#8C877E]" />
             <span>Personalized Guidance</span>
           </div>
-          <h2 className="font-serif text-xl sm:text-3xl text-[#171615] font-light">
+          <h2 className="font-serif text-[22px] sm:text-3xl text-[#171615] font-light">
             Have a project with distinct requirements?
           </h2>
-          <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+          <p className="text-[14.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed">
             Every architectural and interior commission begins with a conversation.
             Share your project parameters with our studio for tailored insights.
           </p>
@@ -144,13 +150,13 @@ export function FAQClient({ faqs }: FAQClientProps) {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0">
           <Link
             href="/calculator"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-[#171615]/30 hover:border-[#171615] text-[#171615] text-xs font-medium uppercase tracking-[0.14em] hover:bg-white transition-all whitespace-nowrap text-center active:scale-[0.98]"
+            className="btn-secondary"
           >
             <span>Cost Calculator</span>
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#171615] text-[#FAF8F5] text-xs font-semibold uppercase tracking-[0.14em] hover:bg-[#32302D] active:scale-[0.98] transition-all whitespace-nowrap text-center group"
+            className="btn-primary group"
           >
             <span>Contact Atelier</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

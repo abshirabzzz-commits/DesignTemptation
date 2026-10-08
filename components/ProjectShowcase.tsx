@@ -15,17 +15,17 @@ export function ProjectShowcase() {
         {/* Section Heading with Editorial Polish */}
         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-[#ECE7DF] pb-4">
           <div className="space-y-1">
-            <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
+            <p className="text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.28em] uppercase text-[#8C877E] font-medium">
               PORTFOLIO
             </p>
-            <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
+            <h2 className="font-serif text-[32px] sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight">
               Selected Projects
             </h2>
           </div>
 
           <Link
             href="/projects"
-            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 group self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs uppercase tracking-[0.16em] font-semibold sm:font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1.5 min-h-[40px] sm:min-h-0 group self-start sm:self-auto"
           >
             <span>View All Projects</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -49,7 +49,7 @@ export function ProjectShowcase() {
         <div className="text-center pt-2">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#171615]/30 hover:border-[#171615] text-[#171615] text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium transition-all group active:scale-[0.98]"
+            className="btn-secondary group w-full max-w-[320px] sm:w-auto inline-flex justify-center mx-auto"
           >
             <span>Explore Complete Portfolio</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

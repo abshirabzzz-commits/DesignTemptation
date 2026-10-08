@@ -391,7 +391,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="fullName"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Full Name <span className="text-[#9A2D1F]">*</span>
             </label>
@@ -402,12 +402,12 @@ export function ProjectEnquiryForm() {
               value={formData.fullName}
               onChange={handleInputChange}
               placeholder="e.g. Rahul Verma"
-              className={`w-full px-3.5 py-2.5 bg-[#FAF8F5] border text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
+              className={`w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
                 errors.fullName ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
               }`}
             />
             {errors.fullName && (
-              <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.fullName}</p>
+              <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.fullName}</p>
             )}
           </div>
 
@@ -415,7 +415,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="email"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Email Address <span className="text-[#9A2D1F]">*</span>
             </label>
@@ -426,12 +426,12 @@ export function ProjectEnquiryForm() {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="e.g. rahul@example.com"
-              className={`w-full px-3.5 py-2.5 bg-[#FAF8F5] border text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
+              className={`w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
                 errors.email ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
               }`}
             />
             {errors.email && (
-              <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.email}</p>
+              <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.email}</p>
             )}
           </div>
         </div>
@@ -442,7 +442,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="phone"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Phone / WhatsApp <span className="text-[#9A2D1F]">*</span>
             </label>
@@ -453,12 +453,12 @@ export function ProjectEnquiryForm() {
               value={formData.phone}
               onChange={handleInputChange}
               placeholder="+91 98765 43210"
-              className={`w-full px-3.5 py-2.5 bg-[#FAF8F5] border text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
+              className={`w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
                 errors.phone ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
               }`}
             />
             {errors.phone && (
-              <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.phone}</p>
+              <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.phone}</p>
             )}
           </div>
 
@@ -466,7 +466,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="projectLocation"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Project Location <span className="text-[#9A2D1F]">*</span>
             </label>
@@ -477,12 +477,12 @@ export function ProjectEnquiryForm() {
               value={formData.projectLocation}
               onChange={handleInputChange}
               placeholder="e.g. Koramangala, Bengaluru"
-              className={`w-full px-3.5 py-2.5 bg-[#FAF8F5] border text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
+              className={`w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] ${
                 errors.projectLocation ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
               }`}
             />
             {errors.projectLocation && (
-              <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">
+              <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">
                 {errors.projectLocation}
               </p>
             )}
@@ -495,7 +495,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="projectType"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Project Type <span className="text-[#9A2D1F]">*</span>
             </label>
@@ -505,7 +505,7 @@ export function ProjectEnquiryForm() {
                 name="projectType"
                 value={formData.projectType}
                 onChange={handleInputChange}
-                className={`w-full px-3.5 py-2.5 bg-[#FAF8F5] border text-sm text-[#171615] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] appearance-none ${
+                className={`w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] appearance-none ${
                   errors.projectType ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
                 }`}
               >
@@ -523,7 +523,7 @@ export function ProjectEnquiryForm() {
               </div>
             </div>
             {errors.projectType && (
-              <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.projectType}</p>
+              <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.projectType}</p>
             )}
           </div>
 
@@ -531,7 +531,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="propertyType"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Property Type <span className="text-[#9A2D1F]">*</span>
             </label>
@@ -541,7 +541,7 @@ export function ProjectEnquiryForm() {
                 name="propertyType"
                 value={formData.propertyType}
                 onChange={handleInputChange}
-                className={`w-full px-3.5 py-2.5 bg-[#FAF8F5] border text-sm text-[#171615] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] appearance-none ${
+                className={`w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] appearance-none ${
                   errors.propertyType ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
                 }`}
               >
@@ -559,7 +559,7 @@ export function ProjectEnquiryForm() {
               </div>
             </div>
             {errors.propertyType && (
-              <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">
+              <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">
                 {errors.propertyType}
               </p>
             )}
@@ -572,7 +572,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="projectArea"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Approx. Area (sq.ft) <span className="text-[#8C877E] font-normal">(Optional)</span>
             </label>
@@ -585,7 +585,7 @@ export function ProjectEnquiryForm() {
               min="100"
               step="50"
               placeholder="e.g. 2400"
-              className="w-full px-3.5 py-2.5 bg-[#FAF8F5] border border-[#ECE7DF] text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615]"
+              className="w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border border-[#ECE7DF] text-base sm:text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615]"
             />
           </div>
 
@@ -593,7 +593,7 @@ export function ProjectEnquiryForm() {
           <div className="space-y-1.5" suppressHydrationWarning>
             <label
               htmlFor="budgetRange"
-              className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+              className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
             >
               Budget Range <span className="text-[#8C877E] font-normal">(Optional)</span>
             </label>
@@ -603,7 +603,7 @@ export function ProjectEnquiryForm() {
                 name="budgetRange"
                 value={formData.budgetRange}
                 onChange={handleInputChange}
-                className="w-full px-3.5 py-2.5 bg-[#FAF8F5] border border-[#ECE7DF] text-sm text-[#171615] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] appearance-none"
+                className="w-full px-3.5 py-3 sm:py-2.5 bg-[#FAF8F5] border border-[#ECE7DF] text-base sm:text-sm text-[#171615] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] appearance-none"
               >
                 <option value="">Select Anticipated Investment</option>
                 {BUDGET_RANGES.map((range) => (
@@ -625,7 +625,7 @@ export function ProjectEnquiryForm() {
         <div className="space-y-1.5" suppressHydrationWarning>
           <label
             htmlFor="requirements"
-            className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+            className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
           >
             Project Requirements <span className="text-[#9A2D1F]">*</span>
           </label>
@@ -636,12 +636,12 @@ export function ProjectEnquiryForm() {
             value={formData.requirements}
             onChange={handleInputChange}
             placeholder="Tell us briefly about your project, requirements, preferred style, timeline, etc."
-            className={`w-full p-3.5 bg-[#FAF8F5] border text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] resize-y ${
+            className={`w-full p-3.5 bg-[#FAF8F5] border text-base sm:text-sm text-[#171615] placeholder-[#A39E95] transition-colors focus:bg-white focus:outline-none focus:border-[#171615] resize-y ${
               errors.requirements ? "border-[#9A2D1F]" : "border-[#ECE7DF]"
             }`}
           />
           {errors.requirements && (
-            <p className="text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.requirements}</p>
+            <p className="text-xs sm:text-[11px] text-[#9A2D1F] tracking-wide mt-1">{errors.requirements}</p>
           )}
         </div>
 
@@ -649,7 +649,7 @@ export function ProjectEnquiryForm() {
         <div className="space-y-2" suppressHydrationWarning>
           <label
             htmlFor="referenceImages"
-            className="block text-[11px] font-sans uppercase tracking-[0.16em] text-[#32302D] font-medium"
+            className="block text-[13px] sm:text-xs font-sans uppercase tracking-[0.14em] sm:tracking-[0.15em] text-[#171615] font-semibold"
           >
             Reference Images <span className="text-[#8C877E] font-normal">(Optional)</span>
           </label>
@@ -706,7 +706,7 @@ export function ProjectEnquiryForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-9 py-4 bg-[#171615] text-[#FAF8F5] text-xs uppercase tracking-[0.16em] font-medium hover:bg-[#32302D] disabled:opacity-60 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="btn-primary w-full sm:w-auto !h-[48px] !min-h-[48px] !px-9 disabled:opacity-60 disabled:cursor-not-allowed group"
           >
             {isSubmitting ? (
               <>
@@ -716,7 +716,7 @@ export function ProjectEnquiryForm() {
             ) : (
               <>
                 <span>SUBMIT ENQUIRY</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </>
             )}
           </button>

@@ -36,8 +36,8 @@ export function ReviewSection() {
           <p className="text-xs text-[#8C877E] font-light">
             {FEATURED_REVIEW.projectType}
           </p>
-          <p className="text-[10px] text-[#8C877E]/80 tracking-widest uppercase pt-1">
-            (Sample Testimonial)
+          <p className="text-[11px] text-[#8C877E]/80 tracking-widest uppercase pt-1">
+            (Sample Testimonial Layout · Client Review Pending Authorization)
           </p>
         </div>
 

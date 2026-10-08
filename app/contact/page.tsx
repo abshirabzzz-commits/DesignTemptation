@@ -8,13 +8,32 @@ import { BRAND } from "@/data/content";
 import { ProjectEnquiryForm } from "@/components/ProjectEnquiryForm";
 
 export const metadata: Metadata = {
-  title: "Contact Atelier | DESIGN TEMPTATION",
+  title: "Contact Atelier",
   description:
-    "Contact DESIGN TEMPTATION - INTERIORS & ARCHITECTURE atelier located at 101, Halasahalli Rd, Kavery Nagar, Bengaluru, Karnataka 560087, India.",
+    "Contact DESIGN TEMPTATION atelier in Bengaluru for residential, commercial, and architectural commissions. Located at 101, Halasahalli Rd, Kavery Nagar, Bengaluru.",
+  alternates: {
+    canonical: "/contact",
+  },
   openGraph: {
     title: "Contact Atelier | DESIGN TEMPTATION",
     description:
-      "Commence a dialogue for residential and commercial commissions. Atelier located in Bengaluru, Karnataka, India.",
+      "Commence a project dialogue for residential and commercial commissions. Atelier located in Bengaluru, Karnataka, India.",
+    url: "/contact",
+    images: [
+      {
+        url: "/images/studio/studio-atelier.jpg",
+        width: 1600,
+        height: 900,
+        alt: "DESIGN TEMPTATION Studio Atelier in Bengaluru",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Atelier | DESIGN TEMPTATION",
+    description:
+      "Commence a project dialogue for residential and commercial commissions. Atelier located in Bengaluru, Karnataka, India.",
+    images: ["/images/studio/studio-atelier.jpg"],
   },
 };
 
@@ -79,7 +98,7 @@ export default function ContactPage() {
                     href={BRAND.googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#171615] text-[#FAF8F5] text-xs uppercase tracking-[0.12em] font-medium hover:bg-[#32302D] transition-colors"
+                    className="btn-primary group !px-4 !text-[11px]"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>View on Google Maps</span>
@@ -88,7 +107,7 @@ export default function ContactPage() {
                     href={BRAND.googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-[#171615] text-[#171615] text-xs uppercase tracking-[0.12em] font-medium hover:bg-[#FAF8F5] transition-colors"
+                    className="btn-secondary group !px-4 !text-[11px]"
                   >
                     <Navigation className="w-3.5 h-3.5" />
                     <span>Get Directions</span>

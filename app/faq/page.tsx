@@ -7,15 +7,33 @@ import { Footer } from "@/components/Footer";
 import { FAQClient } from "./FAQClient";
 
 export const metadata: Metadata = {
-  title: "FAQ | DESIGN TEMPTATION",
+  title: "Frequently Asked Questions",
   description:
-    "Find answers to common questions about DESIGN TEMPTATION's interior design, architecture, turnkey execution, process and project pricing.",
+    "Find answers to common questions about DESIGN TEMPTATION's interior design, architecture, turnkey execution, process, and project pricing.",
+  alternates: {
+    canonical: "/faq",
+  },
   openGraph: {
-    title: "FAQ | DESIGN TEMPTATION",
+    title: "Frequently Asked Questions | DESIGN TEMPTATION",
     description:
-      "Find answers to common questions about DESIGN TEMPTATION's interior design, architecture, turnkey execution, process and project pricing.",
+      "Find answers to common questions about DESIGN TEMPTATION's interior design, architecture, turnkey execution, process, and project pricing.",
     type: "website",
-    url: "https://designtemptation.com/faq",
+    url: "/faq",
+    images: [
+      {
+        url: "/images/hero/hero-main.jpg",
+        width: 1920,
+        height: 1080,
+        alt: "DESIGN TEMPTATION Frequently Asked Questions",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Frequently Asked Questions | DESIGN TEMPTATION",
+    description:
+      "Find answers to common questions about DESIGN TEMPTATION's interior design, architecture, turnkey execution, process, and project pricing.",
+    images: ["/images/hero/hero-main.jpg"],
   },
 };
 
@@ -56,13 +74,13 @@ export default function FAQPage() {
 
           {/* Page Heading */}
           <div className="border-b border-[#ECE7DF] pb-6 space-y-3">
-            <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
+            <p className="text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
               CLIENT ASSISTANCE & OVERVIEW
             </p>
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#171615] font-light tracking-tight">
+            <h1 className="font-serif text-[32px] sm:text-5xl lg:text-6xl text-[#171615] font-light tracking-tight">
               Frequently Asked Questions
             </h1>
-            <p className="max-w-xl text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+            <p className="max-w-xl text-[15.5px] sm:text-base text-[#5A5752] font-light leading-relaxed">
               Clear answers regarding our architectural methodology, engagement timelines, and turnkey interior commissions.
             </p>
           </div>

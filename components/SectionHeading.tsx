@@ -21,7 +21,7 @@ export function SectionHeading({
         <div className="space-y-3">
           {eyebrow && (
             <p
-              className={`text-[11px] font-sans tracking-[0.25em] uppercase font-medium ${
+              className={`text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.25em] uppercase font-medium ${
                 dark ? "text-[#8C877E]" : "text-[#8C877E]"
               }`}
             >
@@ -29,7 +29,7 @@ export function SectionHeading({
             </p>
           )}
           <h2
-            className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight ${
+            className={`font-serif text-[32px] sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.12] sm:leading-tight ${
               dark ? "text-[#FAF8F5]" : "text-[#171615]"
             }`}
           >
@@ -38,7 +38,7 @@ export function SectionHeading({
         </div>
         {description && (
           <p
-            className={`max-w-md text-sm sm:text-base font-light leading-relaxed ${
+            className={`max-w-md text-[15px] sm:text-base font-light leading-relaxed ${
               dark ? "text-[#DFD9CF]" : "text-[#5A5752]"
             }`}
           >
@@ -57,7 +57,7 @@ export function SectionHeading({
     >
       {eyebrow && (
         <p
-          className={`text-[11px] font-sans tracking-[0.25em] uppercase font-medium ${
+          className={`text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.25em] uppercase font-medium ${
             dark ? "text-[#8C877E]" : "text-[#8C877E]"
           }`}
         >
@@ -65,7 +65,7 @@ export function SectionHeading({
         </p>
       )}
       <h2
-        className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.15] ${
+        className={`font-serif text-[32px] sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.14] sm:leading-[1.15] ${
           dark ? "text-[#FAF8F5]" : "text-[#171615]"
         }`}
       >
@@ -73,7 +73,7 @@ export function SectionHeading({
       </h2>
       {description && (
         <p
-          className={`text-sm sm:text-base font-light leading-relaxed pt-2 ${
+          className={`text-[15px] sm:text-base font-light leading-relaxed pt-2 ${
             dark ? "text-[#DFD9CF]" : "text-[#5A5752]"
           }`}
         >

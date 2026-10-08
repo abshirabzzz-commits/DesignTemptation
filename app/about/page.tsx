@@ -9,13 +9,32 @@ import { FinalCTA } from "@/components/FinalCTA";
 import { BRAND } from "@/data/content";
 
 export const metadata: Metadata = {
-  title: "About the Studio | DESIGN TEMPTATION - Interiors & Architecture",
+  title: "About the Studio",
   description:
     "Discover DESIGN TEMPTATION, an architectural and interior design atelier in Bengaluru crafting enduring residential and commercial spaces through light, materiality, and spatial clarity.",
+  alternates: {
+    canonical: "/about",
+  },
   openGraph: {
     title: "About the Studio | DESIGN TEMPTATION",
     description:
       "A design practice dedicated to residential serenity, architectural discipline, and tactile honesty. Located in Bengaluru, Karnataka, India.",
+    url: "/about",
+    images: [
+      {
+        url: "/images/studio/studio-atelier.jpg",
+        width: 1600,
+        height: 900,
+        alt: "DESIGN TEMPTATION Atelier & Material Archive in Bengaluru",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About the Studio | DESIGN TEMPTATION",
+    description:
+      "A design practice dedicated to residential serenity, architectural discipline, and tactile honesty. Located in Bengaluru, Karnataka, India.",
+    images: ["/images/studio/studio-atelier.jpg"],
   },
 };
 
@@ -43,7 +62,7 @@ export default function AboutPage() {
           {/* ============================================================ */}
           <section className="space-y-12">
             <div className="border-b border-[#ECE7DF] pb-8 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#171615] text-[#FAF8F5] text-[10px] tracking-[0.25em] uppercase font-medium">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#171615] text-[#FAF8F5] text-[11px] tracking-[0.25em] uppercase font-medium">
                 <span>The Atelier Story</span>
               </div>
               <div className="space-y-1">
@@ -404,7 +423,7 @@ export default function AboutPage() {
                   href={BRAND.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#171615] text-[#FAF8F5] text-xs uppercase tracking-[0.14em] font-medium hover:bg-[#32302D] transition-colors"
+                  className="btn-primary group"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>View on Google Maps</span>

@@ -6,7 +6,7 @@ export const BRAND = {
   logo: "/images/brand/design-temptation-logo.png",
   founded: "Est. Studio",
   email: "enquiries@designtemptation.com",
-  phone: "+91 98200 12345",
+  phone: "Available upon enquiry",
   location: "Bengaluru, Karnataka, India",
   address: {
     street: "101, Halasahalli Rd",
@@ -62,6 +62,18 @@ export const MOBILE_NAV_ITEMS: NavItem[] = [
 
 // Preserving legacy NAV_ITEMS export for backward compatibility
 export const NAV_ITEMS: NavItem[] = DESKTOP_NAV_ITEMS;
+
+export const FOOTER_NAV_ITEMS: NavItem[] = [
+  { label: "Home", href: "/" },
+  { label: "Projects", href: "/projects" },
+  { label: "Studio", href: "/about" },
+  { label: "Services", href: "/services" },
+  { label: "Products", href: "/products" },
+  { label: "Cost Calculator", href: "/calculator" },
+  { label: "Reviews", href: "/reviews" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact", href: "/contact" },
+];
 
 export const SERVICES: ServiceItem[] = [
   {

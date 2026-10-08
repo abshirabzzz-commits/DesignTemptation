@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -16,32 +22,51 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+import { SITE_URL } from "@/lib/site";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://designtemptation.com"),
-  title: "DESIGN TEMPTATION | INTERIORS & ARCHITECTURE",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "DESIGN TEMPTATION | Interiors & Architecture",
+    template: "%s | DESIGN TEMPTATION",
+  },
   description:
-    "DESIGN TEMPTATION is an interior design and architecture studio shaping thoughtful spaces through light, materiality, and enduring spatial proportion.",
+    "DESIGN TEMPTATION is an interior design and architecture studio in Bengaluru shaping thoughtful residential and commercial spaces through light, materiality, and turnkey execution.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "DESIGN TEMPTATION | INTERIORS & ARCHITECTURE",
+    title: "DESIGN TEMPTATION | Interiors & Architecture",
     description:
-      "Interior design and architecture studio shaping thoughtful spaces through light, materiality, and enduring spatial proportion.",
+      "Interior design and architecture studio in Bengaluru shaping thoughtful residential and commercial spaces through light, materiality, and turnkey execution.",
     type: "website",
     siteName: "DESIGN TEMPTATION",
+    locale: "en_IN",
+    url: SITE_URL,
     images: [
       {
         url: "/images/hero/hero-main.jpg",
         width: 1920,
         height: 1080,
-        alt: "DESIGN TEMPTATION - INTERIORS & ARCHITECTURE",
+        alt: "DESIGN TEMPTATION — Interiors & Architecture",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DESIGN TEMPTATION | INTERIORS & ARCHITECTURE",
+    title: "DESIGN TEMPTATION | Interiors & Architecture",
     description:
-      "Interior design and architecture studio shaping thoughtful spaces through light, materiality, and enduring spatial proportion.",
+      "Interior design and architecture studio in Bengaluru shaping thoughtful residential and commercial spaces through light, materiality, and turnkey execution.",
     images: ["/images/hero/hero-main.jpg"],
+  },
+  icons: {
+    icon: [
+      { url: "/images/brand/design-temptation-logo.png", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    apple: [
+      { url: "/images/brand/design-temptation-logo.png" },
+    ],
   },
 };
 
@@ -54,13 +79,12 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     "name": "DESIGN TEMPTATION",
-    "alternateName": "DESIGN TEMPTATION - INTERIORS & ARCHITECTURE",
+    "alternateName": "DESIGN TEMPTATION — INTERIORS & ARCHITECTURE",
     "description":
-      "DESIGN TEMPTATION is an interior design and architecture studio shaping thoughtful spaces through light, materiality, and enduring spatial proportion.",
-    "url": "https://designtemptation.com",
-    "logo": "https://designtemptation.com/images/brand/design-temptation-logo.png",
-    "image": "https://designtemptation.com/images/hero/hero-main.jpg",
-    "telephone": "+91 98200 12345",
+      "DESIGN TEMPTATION is an interior design and architecture studio in Bengaluru shaping thoughtful residential and commercial spaces through light, materiality, and turnkey execution.",
+    "url": SITE_URL,
+    "logo": `${SITE_URL}/images/brand/design-temptation-logo.png`,
+    "image": `${SITE_URL}/images/hero/hero-main.jpg`,
     "email": "enquiries@designtemptation.com",
     "address": {
       "@type": "PostalAddress",

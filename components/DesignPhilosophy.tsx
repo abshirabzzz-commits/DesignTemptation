@@ -23,7 +23,7 @@ export function DesignPhilosophy() {
                 <span className="font-serif text-3xl sm:text-4xl text-[#8C877E] group-hover:text-[#171615] transition-colors font-light">
                   {item.number}
                 </span>
-                <span className="text-[10px] tracking-[0.25em] uppercase text-[#8C877E]">
+                <span className="text-[11px] tracking-[0.25em] uppercase text-[#8C877E]">
                   Principle
                 </span>
               </div>
@@ -37,7 +37,7 @@ export function DesignPhilosophy() {
                 </p>
               </div>
 
-              <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+              <p className="text-[14.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed">
                 {item.description}
               </p>
             </div>

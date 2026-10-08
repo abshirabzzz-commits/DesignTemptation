@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,6 +7,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { PRODUCTS, BRAND } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SITE_URL } from "@/lib/site";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -17,6 +19,48 @@ export async function generateStaticParams() {
   }));
 }
 
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = PRODUCTS.find((p) => p.slug === slug);
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+    };
+  }
+
+  const metaDescription = `${product.name} — ${product.description}`;
+
+  return {
+    title: product.name,
+    description: metaDescription,
+    alternates: {
+      canonical: `/products/${product.slug}`,
+    },
+    openGraph: {
+      title: `${product.name} | DESIGN TEMPTATION`,
+      description: metaDescription,
+      url: `/products/${product.slug}`,
+      images: [
+        {
+          url: product.image,
+          width: 1200,
+          height: 1200,
+          alt: product.imageAlt || product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.name} | DESIGN TEMPTATION`,
+      description: metaDescription,
+      images: [product.image],
+    },
+  };
+}
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = PRODUCTS.find((p) => p.slug === slug);
@@ -25,8 +69,32 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     notFound();
   }
 
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: `${SITE_URL}${product.image}`,
+    category: product.category,
+    material: product.material,
+    brand: {
+      "@type": "Brand",
+      name: "DESIGN TEMPTATION",
+    },
+    offers: {
+      "@type": "Offer",
+      price: product.numericPrice,
+      priceCurrency: "INR",
+      url: `${SITE_URL}/products/${product.slug}`,
+    },
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <Header />
 
       <main className="flex-1 pt-28 sm:pt-32 pb-20 sm:pb-24">
@@ -57,10 +125,10 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             {/* Spec & Inquiry Column */}
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-3 border-b border-[#ECE7DF] pb-6">
-                <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
+                <p className="text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
                   {product.category}
                 </p>
-                <h1 className="font-serif text-3xl sm:text-4xl text-[#171615] font-light">
+                <h1 className="font-serif text-[32px] sm:text-4xl text-[#171615] font-light">
                   {product.name}
                 </h1>
                 <p className="text-xl font-sans text-[#171615] tracking-wide pt-1">

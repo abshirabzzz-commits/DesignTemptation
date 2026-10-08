@@ -39,22 +39,22 @@ export function FAQPreview() {
       <div className="max-w-4xl mx-auto px-4 sm:px-8 space-y-6 sm:space-y-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase font-semibold text-[#8C877E]">
+          <p className="text-xs sm:text-[11px] font-sans tracking-[0.22em] sm:tracking-[0.28em] uppercase font-semibold text-[#8C877E]">
             INQUIRIES & CLARITY
           </p>
           <h2
             id="faq-preview-heading"
-            className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-[#171615] tracking-tight"
+            className="font-serif text-[32px] sm:text-3xl lg:text-4xl font-light text-[#171615] tracking-tight"
           >
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+          <p className="text-[15.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed">
             Answers to common queries regarding architectural scopes and commissions.
           </p>
         </div>
 
         {/* Compact Accordion Questions */}
-        <div className="space-y-2.5 sm:space-y-3">
+        <div className="space-y-3 sm:space-y-3.5">
           {HOMEPAGE_FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
             const contentId = `faq-preview-panel-${faq.id}`;
@@ -65,8 +65,8 @@ export function FAQPreview() {
                 key={faq.id}
                 className={`border transition-all duration-200 ${
                   isOpen
-                    ? "bg-white border-[#171615]/40"
-                    : "bg-white/80 border-[#ECE7DF] hover:border-[#8C877E]/60"
+                    ? "bg-white border-[#171615]/50 shadow-[0_4px_16px_rgba(23,22,21,0.04)]"
+                    : "bg-white border-[#ECE7DF] hover:border-[#8C877E]/60 shadow-[0_1px_4px_rgba(0,0,0,0.02)]"
                 }`}
               >
                 <button
@@ -75,21 +75,27 @@ export function FAQPreview() {
                   aria-expanded={isOpen}
                   aria-controls={contentId}
                   onClick={() => toggle(index)}
-                  className="w-full min-h-[44px] p-3 sm:p-4 flex items-center justify-between gap-3 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] cursor-pointer"
+                  className="w-full min-h-[50px] p-4 sm:p-5 flex items-center justify-between gap-3 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] cursor-pointer"
                 >
-                  <span className="font-serif text-sm sm:text-base text-[#171615] group-hover:text-[#5A5752] transition-colors leading-snug">
+                  <span
+                    className={`font-serif text-[18px] sm:text-lg transition-colors leading-snug ${
+                      isOpen
+                        ? "text-[#171615] font-normal"
+                        : "text-[#171615] font-light group-hover:text-[#5A5752]"
+                    }`}
+                  >
                     {faq.question}
                   </span>
                   <span
-                    className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full border transition-colors ${
+                    className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full border transition-all duration-200 ${
                       isOpen
                         ? "border-[#171615] bg-[#171615] text-[#FAF8F5]"
-                        : "border-[#ECE7DF] text-[#5A5752]"
+                        : "border-[#ECE7DF] text-[#5A5752] group-hover:border-[#8C877E]"
                     }`}
                   >
                     <Plus
                       aria-hidden="true"
-                      className={`w-3 h-3 transition-transform duration-200 ease-out ${
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ease-out ${
                         isOpen ? "rotate-45" : ""
                       }`}
                     />
@@ -100,13 +106,13 @@ export function FAQPreview() {
                   id={contentId}
                   role="region"
                   aria-labelledby={buttonId}
-                  className={`overflow-hidden transition-all duration-200 ease-out px-3 sm:px-4 ${
+                  className={`overflow-hidden transition-all duration-200 ease-out px-4 sm:px-5 ${
                     isOpen
-                      ? "max-h-96 opacity-100 pb-3.5 pt-1 border-t border-[#ECE7DF]/60"
+                      ? "max-h-96 opacity-100 pb-4 pt-2 border-t border-[#ECE7DF]"
                       : "max-h-0 opacity-0"
                   }`}
                 >
-                  <p className="text-xs sm:text-sm text-[#5A5752] font-light leading-relaxed">
+                  <p className="text-[15.5px] sm:text-sm text-[#5A5752] font-light leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>
@@ -116,10 +122,10 @@ export function FAQPreview() {
         </div>
 
         {/* View All FAQs Secondary Action Button */}
-        <div className="text-center pt-1">
+        <div className="text-center pt-2">
           <Link
             href="/faq"
-            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#171615]/30 hover:border-[#171615] text-[#171615] text-[11px] sm:text-xs uppercase tracking-[0.16em] font-medium transition-all group active:scale-[0.98]"
+            className="btn-secondary group w-full max-w-[320px] sm:w-auto inline-flex justify-center mx-auto text-[14px] sm:text-xs !h-[48px] sm:!h-[44px]"
           >
             <span>VIEW ALL FAQs</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

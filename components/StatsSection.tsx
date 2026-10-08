@@ -5,18 +5,20 @@ import { STATISTICS } from "@/data/content";
 import { StatItem } from "@/types";
 
 function StatCounter({ stat, isInView }: { stat: StatItem; isInView: boolean }) {
-  const [count, setCount] = useState<number>(0);
   const target = stat.numericValue ?? (parseInt(stat.value.replace(/\D/g, ""), 10) || 0);
+  const [count, setCount] = useState<number>(target);
+  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || hasAnimatedRef.current) return;
+    hasAnimatedRef.current = true;
 
     // Check prefers-reduced-motion
     if (typeof window !== "undefined") {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (prefersReducedMotion) {
-        const id = requestAnimationFrame(() => setCount(target));
-        return () => cancelAnimationFrame(id);
+        setCount(target);
+        return;
       }
     }
 
@@ -30,7 +32,8 @@ function StatCounter({ stat, isInView }: { stat: StatItem; isInView: boolean }) 
       const progress = Math.min(elapsed / duration, 1);
       // Cubic ease-out
       const easeOut = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(easeOut * target));
+      // Ensure zero is never displayed on screen
+      setCount(Math.max(1, Math.floor(easeOut * target)));
 
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(animate);
@@ -48,7 +51,7 @@ function StatCounter({ stat, isInView }: { stat: StatItem; isInView: boolean }) 
 
   return (
     <div className="flex items-baseline justify-center">
-      <span className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight tabular-nums">
+      <span className="font-serif text-[36px] sm:text-4xl lg:text-5xl font-light text-[#171615] tracking-tight tabular-nums">
         {count}
       </span>
       <span className="font-serif text-xl sm:text-2xl lg:text-3xl text-[#8C877E] font-light ml-0.5">
@@ -66,6 +69,13 @@ export function StatsSection() {
     const el = containerRef.current;
     if (!el) return;
 
+    // Trigger immediately if already within viewport
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setIsInView(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -73,7 +83,7 @@ export function StatsSection() {
           observer.disconnect();
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.1 }
     );
 
     observer.observe(el);
@@ -85,8 +95,8 @@ export function StatsSection() {
 
   return (
     <section
-      ref={containerRef}
       aria-label="Studio Statistics & Milestones"
+      ref={containerRef}
       className="py-8 sm:py-14 lg:py-16 bg-[#F7F5F0] border-y border-[#ECE7DF]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
@@ -107,7 +117,7 @@ export function StatsSection() {
                 } lg:border-b-0`}
               >
                 <StatCounter stat={stat} isInView={isInView} />
-                <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.2em] uppercase text-[#8C877E] font-medium leading-relaxed">
+                <p className="text-[12px] sm:text-[11px] font-sans tracking-[0.16em] sm:tracking-[0.2em] uppercase text-[#8C877E] font-semibold sm:font-medium leading-tight sm:leading-relaxed">
                   {stat.label}
                 </p>
               </div>
