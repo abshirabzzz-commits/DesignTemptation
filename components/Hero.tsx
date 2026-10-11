@@ -26,13 +26,13 @@ export function Hero() {
 
       {/* Hero Content Container - Center-aligned on mobile, bottom-left on desktop */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 text-[#FAF8F5]">
-        <div className="w-full max-w-xl sm:max-w-2xl lg:max-w-3xl mx-auto sm:mx-0 text-center sm:text-left flex flex-col items-center sm:items-start space-y-4 sm:space-y-5 lg:space-y-6">
+        <div className="w-full max-w-xl sm:max-w-2xl lg:max-w-3xl mx-auto sm:mx-0 text-center sm:text-left flex flex-col items-center sm:items-start space-y-4 sm:space-y-5">
           {/* Primary Editorial Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.05, ease: [0.25, 1, 0.5, 1] }}
-            className="w-full text-center sm:text-left font-serif text-[35px] sm:text-[44px] md:text-5xl lg:text-[62px] xl:text-[68px] font-light tracking-tight leading-[1.12] sm:leading-[1.04] text-[#FAF8F5]"
+            className="w-full text-center sm:text-left font-serif text-[36px] sm:text-[46px] md:text-5xl lg:text-[64px] xl:text-[70px] font-light tracking-[-0.015em] sm:tracking-[-0.02em] leading-[1.1] sm:leading-[1.02] text-[#FAF8F5]"
           >
             Spaces Designed
             <br />
@@ -44,7 +44,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.18, ease: [0.25, 1, 0.5, 1] }}
-            className="w-full max-w-[340px] sm:max-w-lg lg:max-w-xl text-center sm:text-left text-[16px] sm:text-base text-[#DFD9CF] font-light leading-relaxed mx-auto sm:mx-0"
+            className="w-full max-w-[340px] sm:max-w-lg lg:max-w-xl text-center sm:text-left font-sans text-[15px] sm:text-base text-[#DFD9CF] font-light leading-relaxed tracking-normal mx-auto sm:mx-0"
           >
             Thoughtful interiors shaped by light, material and the way you live.
           </motion.p>
@@ -54,7 +54,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.3, ease: [0.25, 1, 0.5, 1] }}
-            className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-3.5 pt-3 sm:pt-2 w-full sm:w-auto mx-auto sm:mx-0"
+            className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-3.5 pt-2 sm:pt-2.5 w-full sm:w-auto mx-auto sm:mx-0"
           >
             {/* Primary CTA */}
             <a

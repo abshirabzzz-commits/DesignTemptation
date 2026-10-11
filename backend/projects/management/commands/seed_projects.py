@@ -126,10 +126,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for item in INITIAL_PROJECTS:
-            gallery_urls = item.pop("gallery", [])
+            item_data = dict(item)
+            gallery_urls = item_data.pop("gallery", [])
             project, created = Project.objects.update_or_create(
-                slug=item["slug"],
-                defaults=item
+                slug=item_data["slug"],
+                defaults=item_data
             )
             # Clear and re-populate gallery
             project.gallery_images.all().delete()

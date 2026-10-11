@@ -13,7 +13,8 @@ export const SITE_URL: string = (() => {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
   }
-  return "https://designtemptation1.vercel.app";
+  // Safe production fallback if environment variable is unset
+  return "https://designtemptation.com";
 })();
 
 export const SITE_NAME = "DESIGN TEMPTATION";

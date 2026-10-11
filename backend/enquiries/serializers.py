@@ -21,7 +21,12 @@ class ProjectEnquirySerializer(serializers.ModelSerializer):
             'status',
             'created_at',
         ]
-        read_only_fields = ['id', 'status', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+    def create(self, validated_data):
+        # Force default 'New' status on public submission
+        validated_data['status'] = 'New'
+        return super().create(validated_data)
 
     def validate_full_name(self, value):
         if not value or not value.strip():

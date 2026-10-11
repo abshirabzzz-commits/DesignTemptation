@@ -13,11 +13,10 @@ function StatCounter({ stat, isInView }: { stat: StatItem; isInView: boolean }) 
     if (!isInView || hasAnimatedRef.current) return;
     hasAnimatedRef.current = true;
 
-    // Check prefers-reduced-motion
+    // Check prefers-reduced-motion: count is already initialized to target
     if (typeof window !== "undefined") {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (prefersReducedMotion) {
-        setCount(target);
         return;
       }
     }

@@ -2,14 +2,26 @@ from rest_framework import viewsets, permissions
 from .models import Project
 from .serializers import ProjectSerializer
 
+class IsAdminUserOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission allowing public read-only access (GET, HEAD, OPTIONS)
+    while requiring authenticated Django staff/admin credentials for write operations
+    (POST, PUT, PATCH, DELETE).
+    """
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return bool(request.user and request.user.is_authenticated and request.user.is_staff)
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Projects portfolio.
-    Allows listing, retrieval by slug or ID, filtering by category or featured status.
+    Allows public listing and retrieval by slug or ID.
+    Restricts creation, updates, and deletion to authenticated staff/admin users.
     """
     queryset = Project.objects.all().prefetch_related('gallery_images')
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAdminUserOrReadOnly]
     lookup_field = 'slug'
 
     def get_queryset(self):

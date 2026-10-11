@@ -72,6 +72,7 @@ export function ProjectEnquiryForm() {
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [honeypot, setHoneypot] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -181,6 +182,9 @@ export function ProjectEnquiryForm() {
       if (selectedFile) {
         data.append("reference_images", selectedFile);
       }
+      if (honeypot) {
+        data.append("_hp_website", honeypot);
+      }
 
       const res = await fetch("/api/enquiries", {
         method: "POST",
@@ -241,13 +245,15 @@ export function ProjectEnquiryForm() {
         setErrors(backendErrors);
       } else {
         setErrors({
-          general: "Something went wrong. Please try again.",
+          general:
+            result?.message ||
+            "Unable to deliver enquiry. Please contact our studio directly at enquiries@designtemptation.com.",
         });
       }
-    } catch (err) {
-      console.error("Enquiry submission error:", err);
+    } catch {
       setErrors({
-        general: "Something went wrong. Please try again.",
+        general:
+          "Unable to connect to the enquiry service. Please contact our studio directly at enquiries@designtemptation.com.",
       });
     } finally {
       setIsSubmitting(false);
@@ -385,6 +391,20 @@ export function ProjectEnquiryForm() {
       )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-6" suppressHydrationWarning>
+        {/* Anti-spam honeypot trap field (hidden from genuine users) */}
+        <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+          <label htmlFor="_hp_website">Leave this blank</label>
+          <input
+            type="text"
+            id="_hp_website"
+            name="_hp_website"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
         {/* ROW 1: Full Name & Email */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
           {/* 1. Full Name */}

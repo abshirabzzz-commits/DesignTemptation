@@ -1,0 +1,26 @@
+# ==============================================================================
+# DESIGN TEMPTATION — Backend Production Dependencies
+# Target Runtime: Python >= 3.12, Django 6.0 REST Framework
+# ==============================================================================
+
+# Core Framework & REST API
+Django>=6.0.0,<6.1.0
+djangorestframework>=3.16.0,<3.17.0
+django-cors-headers>=4.9.0,<5.0.0
+
+# WSGI Production HTTP Server
+gunicorn>=23.0.0,<24.0.0
+
+# Database Driver & URL Parser (PostgreSQL Support)
+psycopg[binary]>=3.2.0,<4.0.0
+dj-database-url>=2.3.0,<3.0.0
+
+# Production Static Asset Serving
+whitenoise>=6.8.0,<7.0.0
+
+# Cloud Media & File Storage (AWS S3 & Cloudflare R2 Compatibility)
+django-storages>=1.14.4,<2.0.0
+boto3>=1.35.0,<2.0.0
+
+# Environment Management
+python-dotenv>=1.0.1,<2.0.0
