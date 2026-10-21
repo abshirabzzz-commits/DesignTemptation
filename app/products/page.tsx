@@ -93,15 +93,13 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="pt-2.5 border-t border-[#ECE7DF]">
-                  <a
-                    href={`mailto:${BRAND.email}?subject=Acquisition%20Inquiry%20-%20${encodeURIComponent(
-                      product.name
-                    )}`}
+                  <Link
+                    href={`/products/${product.slug}`}
                     className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.14em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 min-h-[36px] sm:min-h-0"
                   >
                     <span>Acquire Piece</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}

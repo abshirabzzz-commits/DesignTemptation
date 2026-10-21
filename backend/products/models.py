@@ -31,3 +31,45 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.price})"
+
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Processing', 'Processing'),
+        ('Shipped', 'Shipped'),
+        ('Delivered', 'Delivered'),
+        ('Cancelled', 'Cancelled'),
+    ]
+
+    order_number = models.CharField(max_length=64, unique=True, verbose_name="Order Reference")
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='orders', verbose_name="Product")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Quantity")
+    unit_price = models.PositiveIntegerField(verbose_name="Unit Price (₹)")
+    total_amount = models.PositiveIntegerField(verbose_name="Total Amount (₹)")
+    currency = models.CharField(max_length=10, default="INR", verbose_name="Currency")
+
+    # Customer Information
+    customer_name = models.CharField(max_length=255, verbose_name="Customer Name")
+    customer_email = models.EmailField(verbose_name="Customer Email")
+    customer_phone = models.CharField(max_length=50, verbose_name="Phone / WhatsApp")
+
+    # Delivery Information
+    delivery_address = models.TextField(verbose_name="Delivery Address")
+    city = models.CharField(max_length=100, verbose_name="City")
+    state = models.CharField(max_length=100, verbose_name="State")
+    postal_code = models.CharField(max_length=20, verbose_name="Postal / PIN Code")
+    notes = models.TextField(blank=True, verbose_name="Order Notes / Commission Instructions")
+
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending', verbose_name="Order Status")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Order Date")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+
+    class Meta:
+        verbose_name = "Product Order"
+        verbose_name_plural = "Product Orders"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.order_number} - {self.customer_name} ({self.product.name} × {self.quantity})"

@@ -1,6 +1,7 @@
-from rest_framework import viewsets, permissions
-from .models import Product
-from .serializers import ProductSerializer
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from .models import Product, Order
+from .serializers import ProductSerializer, OrderSerializer
 
 class IsAdminUserOrReadOnly(permissions.BasePermission):
     """
@@ -37,3 +38,42 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(featured=is_featured)
 
         return queryset
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for customer product orders.
+    POST /api/orders/ - Place new acquisition order (Public: AllowAny)
+    GET /api/orders/  - List all orders for studio administration (Admin only)
+    GET /api/orders/{id}/ - Order details (Admin only)
+    PATCH / PUT / DELETE - Order management & status update (Admin only)
+    """
+    queryset = Order.objects.all().order_by('-created_at')
+    serializer_class = OrderSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "success": False,
+                    "errors": serializer.errors,
+                    "message": "Order validation failed. Please review the provided details."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        order = serializer.save()
+        return Response(
+            {
+                "success": True,
+                "message": f"Thank you for acquiring {order.product.name}. Your order reference is {order.order_number}. Our atelier concierge will contact you to coordinate delivery.",
+                "data": serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )

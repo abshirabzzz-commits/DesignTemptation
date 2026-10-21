@@ -34,6 +34,7 @@ export function Header() {
   return (
     <>
       <header
+        id="top"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out bg-[#FAF8F5] border-b border-[#ECE7DF] ${
           isScrolled
             ? "shadow-[0_2px_16px_rgba(0,0,0,0.03)]"

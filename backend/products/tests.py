@@ -119,3 +119,133 @@ class ProductAPIPermissionsTestCase(TestCase):
         del_res = self.staff_client.delete(f"/api/products/{payload['slug']}/")
         self.assertEqual(del_res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Product.objects.filter(slug="alabaster-wall-sconce").exists())
+
+
+class OrderAPIPermissionsTestCase(TestCase):
+    def setUp(self):
+        self.anonymous_client = APIClient()
+
+        # Create test product
+        self.product = Product.objects.create(
+            name="Monolithic Travertine Console",
+            slug="monolithic-travertine-console",
+            category="Living Objects",
+            price="₹6,40,000",
+            numeric_price=640000,
+            image="/images/products/console.jpg",
+            available=True,
+        )
+
+        self.unavailable_product = Product.objects.create(
+            name="Sold Out Armchair",
+            slug="sold-out-armchair",
+            category="Seating Collection",
+            price="₹3,20,000",
+            numeric_price=320000,
+            image="/images/products/chair.jpg",
+            available=False,
+        )
+
+        # Create staff admin user
+        self.staff_user = User.objects.create_user(
+            username="order_admin",
+            email="concierge@designtemptation.com",
+            password="AdminPassword123!",
+            is_staff=True,
+        )
+        self.staff_client = APIClient()
+        self.staff_client.force_authenticate(user=self.staff_user)
+
+    def test_public_can_create_order_with_server_computed_total(self):
+        payload = {
+            "product_slug": self.product.slug,
+            "quantity": 2,
+            "customer_name": "Aarav Mehta",
+            "customer_email": "aarav@example.com",
+            "customer_phone": "+91 98765 43210",
+            "delivery_address": "Flat 402, Embassy Habitat, Vasanth Nagar",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "postal_code": "560052",
+            "notes": "Please arrange white-glove assembly on weekend.",
+            # Malicious client attempting to pass price 100
+            "unit_price": 100,
+            "total_amount": 200,
+        }
+        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data["success"])
+
+        data = response.data["data"]
+        # Verify server overwrote price with canonical database price
+        self.assertEqual(data["unit_price"], 640000)
+        self.assertEqual(data["total_amount"], 1280000)
+        self.assertEqual(data["currency"], "INR")
+        self.assertEqual(data["status"], "Pending")
+        self.assertTrue(data["order_number"].startswith("DT-ORD-"))
+
+    def test_cannot_order_unavailable_product(self):
+        payload = {
+            "product_slug": self.unavailable_product.slug,
+            "quantity": 1,
+            "customer_name": "Rohit Sen",
+            "customer_email": "rohit@example.com",
+            "customer_phone": "+91 98765 11223",
+            "delivery_address": "12 Richmond Road",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "postal_code": "560025",
+        }
+        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_rejects_invalid_quantity(self):
+        payload = {
+            "product_slug": self.product.slug,
+            "quantity": 0,
+            "customer_name": "Rohit Sen",
+            "customer_email": "rohit@example.com",
+            "customer_phone": "+91 98765 11223",
+            "delivery_address": "12 Richmond Road",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "postal_code": "560025",
+        }
+        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_anonymous_cannot_list_orders(self):
+        response = self.anonymous_client.get("/api/orders/")
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+    def test_staff_user_can_list_and_update_order_status(self):
+        from products.models import Order
+        order = Order.objects.create(
+            order_number="DT-ORD-TEST01",
+            product=self.product,
+            quantity=1,
+            unit_price=640000,
+            total_amount=640000,
+            customer_name="Priya Sharma",
+            customer_email="priya@example.com",
+            customer_phone="+91 9988776655",
+            delivery_address="34 Lavelle Road",
+            city="Bengaluru",
+            state="Karnataka",
+            postal_code="560001",
+            status="Pending",
+        )
+
+        # Staff can list orders
+        list_res = self.staff_client.get("/api/orders/")
+        self.assertEqual(list_res.status_code, status.HTTP_200_OK)
+
+        # Staff can update status to Confirmed
+        patch_res = self.staff_client.patch(
+            f"/api/orders/{order.id}/",
+            {"status": "Confirmed"},
+            format="json"
+        )
+        self.assertEqual(patch_res.status_code, status.HTTP_200_OK)
+        order.refresh_from_db()
+        self.assertEqual(order.status, "Confirmed")

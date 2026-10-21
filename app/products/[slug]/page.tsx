@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { PRODUCTS, BRAND } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ProductOrderSection } from "@/components/ProductOrderSection";
 import { SITE_URL } from "@/lib/site";
 
 interface ProductPageProps {
@@ -152,18 +153,18 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 </div>
               </div>
 
-              {/* Acquisition CTA */}
-              <div className="pt-4 space-y-3">
+              {/* Interactive Acquisition & Ordering */}
+              <ProductOrderSection product={product} />
+
+              {/* Bespoke Customization Fallback Link */}
+              <div className="pt-2 text-center">
                 <a
-                  href={`mailto:${BRAND.email}?subject=Acquisition%20Inquiry%20-%20${encodeURIComponent(product.name)}`}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#171615] text-[#FAF8F5] text-xs font-medium uppercase tracking-[0.14em] hover:bg-[#32302D] transition-colors"
+                  href={`mailto:${BRAND.email}?subject=Custom%20Commission%20Inquiry%20-%20${encodeURIComponent(product.name)}`}
+                  className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-[#8C877E] hover:text-[#171615] transition-colors"
                 >
-                  <span>Inquire for Acquisition</span>
-                  <ArrowUpRight className="w-4 h-4" />
+                  <span>Request Custom Material or Dimensions</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>
-                <p className="text-[11px] text-[#8C877E] text-center tracking-wide">
-                  Lead times & international freight calculated per commission
-                </p>
               </div>
             </div>
           </div>

@@ -103,7 +103,7 @@ export function Footer() {
           <div className="flex items-center gap-5 sm:gap-6">
             <span className="hidden sm:inline">Interiors &amp; Architecture</span>
             <a
-              href="#"
+              href="#top"
               className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs font-medium text-[#171615] hover:text-[#8C877E] transition-colors py-1"
               aria-label="Back to top"
             >
