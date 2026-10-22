@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Order
+from .models import Product, Order, CartItem, WishlistItem
 import re
 import uuid
 
@@ -39,6 +39,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'order_number',
+            'user',
             'product',
             'product_slug',
             'product_details',
@@ -60,6 +61,7 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id',
+            'user',
             'unit_price',
             'total_amount',
             'currency',
@@ -145,4 +147,86 @@ class OrderSerializer(serializers.ModelSerializer):
             random_suffix = uuid.uuid4().hex[:6].upper()
             attrs['order_number'] = f"DT-ORD-{random_suffix}"
 
+        # Associate authenticated user if present in request context
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated and self.instance is None:
+            attrs['user'] = request.user
+
+        return attrs
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product_slug = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Product.objects.all(),
+        source='product',
+        write_only=True,
+        required=False,
+    )
+    product_details = ProductSerializer(source='product', read_only=True)
+    subtotal = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = [
+            'id',
+            'product',
+            'product_slug',
+            'product_details',
+            'quantity',
+            'subtotal',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'subtotal']
+        extra_kwargs = {
+            'product': {'required': False},
+        }
+
+    def validate(self, attrs):
+        product = attrs.get('product')
+        if not product and self.instance:
+            product = self.instance.product
+        quantity = attrs.get('quantity', 1)
+
+        if not product and not self.instance:
+            raise serializers.ValidationError({"product": "A valid product or product_slug is required."})
+
+        if product and not product.available:
+            raise serializers.ValidationError({"product": f"{product.name} is currently not available for acquisition."})
+
+        if quantity < 1 or quantity > 10:
+            raise serializers.ValidationError({"quantity": "Quantity must be between 1 and 10 pieces."})
+
+        return attrs
+
+
+class WishlistItemSerializer(serializers.ModelSerializer):
+    product_slug = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Product.objects.all(),
+        source='product',
+        write_only=True,
+        required=False,
+    )
+    product_details = ProductSerializer(source='product', read_only=True)
+
+    class Meta:
+        model = WishlistItem
+        fields = [
+            'id',
+            'product',
+            'product_slug',
+            'product_details',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'created_at']
+        extra_kwargs = {
+            'product': {'required': False},
+        }
+
+    def validate(self, attrs):
+        product = attrs.get('product')
+        if not product and not self.instance:
+            raise serializers.ValidationError({"product": "A valid product or product_slug is required."})
         return attrs

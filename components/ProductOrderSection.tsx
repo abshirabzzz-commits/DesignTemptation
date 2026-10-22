@@ -3,16 +3,20 @@
 import React, { useState } from "react";
 import { ProductItem } from "@/types";
 import { formatINR } from "@/data/content";
-import { ArrowUpRight, CheckCircle2, AlertCircle, Plus, Minus, ShieldCheck, Truck } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, AlertCircle, Plus, Minus, ShieldCheck, Truck, ShoppingBag, Heart } from "lucide-react";
+import { useAuth } from "./AuthProvider";
+import { apiAddToCart, apiToggleWishlist, getStoredToken } from "@/lib/api";
 
 interface ProductOrderSectionProps {
   product: ProductItem;
 }
 
 export function ProductOrderSection({ product }: ProductOrderSectionProps) {
+  const { user, isAuthenticated, openAuthModal, refreshCart, refreshWishlist } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cartFeedback, setCartFeedback] = useState<string | null>(null);
   const [orderSuccess, setOrderSuccess] = useState<{
     orderNumber: string;
     totalAmount: string;
@@ -31,7 +35,23 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
   const [notes, setNotes] = useState("");
   const [honeypot, setHoneypot] = useState("");
 
+  // Pre-fill fields from authenticated user
+  React.useEffect(() => {
+    if (user) {
+      if (user.full_name) setCustomerName(user.full_name);
+      if (user.email) setCustomerEmail(user.email);
+      if (user.profile) {
+        if (user.profile.phone) setCustomerPhone(user.profile.phone);
+        if (user.profile.delivery_address) setDeliveryAddress(user.profile.delivery_address);
+        if (user.profile.city) setCity(user.profile.city);
+        if (user.profile.state) setState(user.profile.state);
+        if (user.profile.postal_code) setPostalCode(user.profile.postal_code);
+      }
+    }
+  }, [user]);
+
   const unitPrice = product.numericPrice || 0;
+
   const totalPrice = unitPrice * quantity;
   const formattedTotal = formatINR(totalPrice);
 
@@ -67,9 +87,15 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
         _hp_website: honeypot,
       };
 
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const token = getStoredToken();
+      if (token) {
+        headers["Authorization"] = `Token ${token}`;
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(payload),
       });
 
@@ -163,7 +189,14 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
 
   return (
     <div className="pt-4 space-y-4">
-      {/* Primary Order Action Button */}
+      {/* Primary Order & Cart Actions */}
+      {cartFeedback && (
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>{cartFeedback}</span>
+        </div>
+      )}
+
       {!isOpen ? (
         <div className="space-y-3">
           <button
@@ -171,9 +204,53 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
             onClick={() => setIsOpen(true)}
             className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#171615] text-[#FAF8F5] text-xs font-medium uppercase tracking-[0.14em] hover:bg-[#32302D] transition-colors shadow-sm"
           >
-            <span>Order Piece — {product.price}</span>
+            <span>Direct Acquisition — {product.price}</span>
             <ArrowUpRight className="w-4 h-4" />
           </button>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!isAuthenticated) {
+                  openAuthModal("signin");
+                  return;
+                }
+                const res = await apiAddToCart(product.slug, 1);
+                if (res.success) {
+                  await refreshCart();
+                  setCartFeedback(`Added ${product.name} to your cart.`);
+                  setTimeout(() => setCartFeedback(null), 3000);
+                }
+              }}
+              className="py-3 px-4 border border-[#171615] text-[#171615] text-xs font-semibold tracking-wider uppercase hover:bg-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>Add to Cart</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                if (!isAuthenticated) {
+                  openAuthModal("signin");
+                  return;
+                }
+                const res = await apiToggleWishlist(product.slug);
+                if (res.success) {
+                  await refreshWishlist();
+                  setCartFeedback(res.message || "Updated wishlist.");
+                  setTimeout(() => setCartFeedback(null), 3000);
+                }
+
+              }}
+              className="py-3 px-4 border border-[#DFD9CF] text-[#5A5752] hover:text-[#171615] hover:border-[#171615] text-xs font-semibold tracking-wider uppercase hover:bg-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <Heart className="w-4 h-4" />
+              <span>Wishlist</span>
+            </button>
+          </div>
+
           <div className="flex items-center justify-center gap-4 text-[11px] text-[#8C877E] text-center tracking-wide">
             <span className="inline-flex items-center gap-1">
               <Truck className="w-3.5 h-3.5 text-[#8C877E]" /> Insured White-Glove Freight

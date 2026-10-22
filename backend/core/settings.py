@@ -4,6 +4,7 @@ Django settings for interior-studio backend.
 
 from pathlib import Path
 import os
+import sys
 
 # Load environment variables from .env or .env.local if present
 try:
@@ -14,6 +15,9 @@ except ImportError:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Detect local CLI operations (e.g. tests or syntax checks) outside of production
+is_cli_dev = any(arg in sys.argv for arg in ['test', 'check', 'makemigrations']) and not os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
 
@@ -21,7 +25,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 if not SECRET_KEY:
-    if DEBUG:
+    if DEBUG or is_cli_dev:
         # Development fallback only - explicit insecure key for local testing
         SECRET_KEY = 'django-insecure-development-key-for-local-use-only'
     else:
@@ -38,7 +42,7 @@ if allowed_hosts_env:
     ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
 elif render_hostname:
     ALLOWED_HOSTS = [render_hostname]
-elif DEBUG:
+elif DEBUG or is_cli_dev:
     # Safe local development defaults
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 else:
@@ -62,8 +66,10 @@ INSTALLED_APPS = [
     # Third party apps
     'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     
     # Local apps
+    'accounts.apps.AccountsConfig',
     'enquiries.apps.EnquiriesConfig',
     'projects.apps.ProjectsConfig',
     'products.apps.ProductsConfig',
@@ -229,6 +235,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
@@ -236,6 +243,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', os.environ.get('GOOGLE_OAUTH_CLIENT_ID', ''))
+
 
 # ==============================================================================
 # CORS & CSRF Settings
@@ -256,6 +266,9 @@ elif DEBUG:
 else:
     CORS_ALLOWED_ORIGINS = []
     CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 csrf_trusted_env = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS')
 if csrf_trusted_env:

@@ -105,3 +105,62 @@ export interface ProcessStep {
   description: string;
 }
 
+export interface CustomerProfile {
+  phone: string;
+  delivery_address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  is_staff: boolean;
+  profile?: CustomerProfile;
+}
+
+export interface CartItem {
+  id: number;
+  product: number;
+  product_slug?: string;
+  product_details: ProductItem;
+  quantity: number;
+  subtotal: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WishlistItem {
+  id: number;
+  product: number;
+  product_slug?: string;
+  product_details: ProductItem;
+  created_at: string;
+}
+
+export interface OrderRecord {
+  id: number;
+  order_number: string;
+  user?: number | null;
+  product: number;
+  product_details: ProductItem;
+  quantity: number;
+  unit_price: number;
+  total_amount: number;
+  currency: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  delivery_address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  notes?: string;
+  status: 'Pending' | 'Confirmed' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  created_at: string;
+  updated_at: string;
+}

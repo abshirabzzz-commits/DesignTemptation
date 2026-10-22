@@ -33,6 +33,8 @@ class Product(models.Model):
         return f"{self.name} ({self.price})"
 
 
+from django.conf import settings
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -44,6 +46,14 @@ class Order(models.Model):
     ]
 
     order_number = models.CharField(max_length=64, unique=True, verbose_name="Order Reference")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders',
+        verbose_name="Customer Account"
+    )
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='orders', verbose_name="Product")
     quantity = models.PositiveIntegerField(default=1, verbose_name="Quantity")
     unit_price = models.PositiveIntegerField(verbose_name="Unit Price (₹)")
@@ -73,3 +83,59 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.order_number} - {self.customer_name} ({self.product.name} × {self.quantity})"
+
+
+class CartItem(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='cart_items',
+        verbose_name="Customer Account"
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='cart_items',
+        verbose_name="Product"
+    )
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Quantity")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Added At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+
+    class Meta:
+        verbose_name = "Cart Item"
+        verbose_name_plural = "Cart Items"
+        unique_together = ('user', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.product.name} (×{self.quantity})"
+
+    @property
+    def subtotal(self):
+        return self.product.numeric_price * self.quantity
+
+
+class WishlistItem(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='wishlist_items',
+        verbose_name="Customer Account"
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='wishlist_items',
+        verbose_name="Product"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Saved At")
+
+    class Meta:
+        verbose_name = "Wishlist Item"
+        verbose_name_plural = "Wishlist Items"
+        unique_together = ('user', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.product.name}"

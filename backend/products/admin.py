@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Product, Order
+from .models import Product, Order, CartItem, WishlistItem
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -37,6 +38,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'order_number',
         'customer_name',
+        'user',
         'product',
         'quantity',
         'formatted_total',
@@ -49,7 +51,7 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('order_number', 'created_at', 'updated_at', 'unit_price', 'total_amount')
     fieldsets = (
         ('Order Identification', {
-            'fields': ('order_number', 'status', 'created_at', 'updated_at')
+            'fields': ('order_number', 'user', 'status', 'created_at', 'updated_at')
         }),
         ('Product & Pricing (INR)', {
             'fields': ('product', 'quantity', 'unit_price', 'total_amount', 'currency')
@@ -65,3 +67,21 @@ class OrderAdmin(admin.ModelAdmin):
     def formatted_total(self, obj):
         return f"₹{obj.total_amount:,}"
     formatted_total.short_description = "Total (INR)"
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'quantity', 'subtotal_display', 'created_at')
+    search_fields = ('user__email', 'product__name')
+    readonly_fields = ('created_at', 'updated_at')
+
+    def subtotal_display(self, obj):
+        return f"₹{obj.subtotal:,}"
+    subtotal_display.short_description = "Subtotal (₹)"
+
+
+@admin.register(WishlistItem)
+class WishlistItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at')
+    search_fields = ('user__email', 'product__name')
+    readonly_fields = ('created_at',)

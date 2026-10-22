@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { BRAND, DESKTOP_NAV_ITEMS, MOBILE_NAV_ITEMS } from "@/data/content";
+import { AccountMenu } from "./AccountMenu";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -93,31 +94,35 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Desktop CTA Button - Refined architectural proportions */}
-          <div className="hidden md:flex items-center">
+          {/* Desktop CTA & Account Menu */}
+          <div className="hidden md:flex items-center space-x-3.5">
             <Link
               href="/contact"
               className="btn-primary !h-[38px] !min-h-[38px] !px-4.5 lg:!px-5 text-[11px] font-semibold tracking-[0.14em]"
             >
               START A PROJECT
             </Link>
+            <AccountMenu />
           </div>
 
-          {/* Mobile Menu Button - Accessible touch target */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2.5 -mr-1.5 min-h-[48px] min-w-[48px] flex items-center justify-center text-[#171615] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] active:scale-95 transition-transform cursor-pointer"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-navigation"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-7 h-7 stroke-[2]" />
-            ) : (
-              <Menu className="w-7 h-7 stroke-[2]" />
-            )}
-          </button>
+          {/* Mobile Right Controls: Account Icon + Hamburger */}
+          <div className="md:hidden flex items-center space-x-1 -mr-1.5">
+            <AccountMenu />
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#171615] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#171615] active:scale-95 transition-transform cursor-pointer"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 stroke-[2]" />
+              ) : (
+                <Menu className="w-6 h-6 stroke-[2]" />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -150,7 +155,9 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="space-y-4 pt-6 border-t border-[#ECE7DF] mt-6">
+        <div className="space-y-4 pt-4 border-t border-[#ECE7DF] mt-4">
+          <AccountMenu mobile />
+
           <Link
             href="/contact"
             onClick={() => setMobileMenuOpen(false)}

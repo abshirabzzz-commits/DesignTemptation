@@ -249,3 +249,196 @@ class OrderAPIPermissionsTestCase(TestCase):
         self.assertEqual(patch_res.status_code, status.HTTP_200_OK)
         order.refresh_from_db()
         self.assertEqual(order.status, "Confirmed")
+
+
+class CartAPITestCase(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="shopper1@example.com",
+            email="shopper1@example.com",
+            password="Password123!"
+        )
+        self.client1 = APIClient()
+        self.client1.force_authenticate(user=self.user1)
+
+        self.user2 = User.objects.create_user(
+            username="shopper2@example.com",
+            email="shopper2@example.com",
+            password="Password123!"
+        )
+        self.client2 = APIClient()
+        self.client2.force_authenticate(user=self.user2)
+
+        self.product = Product.objects.create(
+            name="Honed Marble Credenza",
+            slug="honed-marble-credenza",
+            category="Living Objects",
+            price="₹4,50,000",
+            numeric_price=450000,
+            image="/images/products/credenza.jpg",
+            available=True
+        )
+
+    def test_anonymous_cannot_access_cart(self):
+        anon_client = APIClient()
+        res = anon_client.get("/api/cart/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_add_and_list_cart_item_with_server_computed_total(self):
+        # Add item
+        add_res = self.client1.post("/api/cart/", {
+            "product_slug": self.product.slug,
+            "quantity": 2
+        }, format="json")
+        self.assertEqual(add_res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(add_res.data["success"])
+
+        # List cart
+        list_res = self.client1.get("/api/cart/")
+        self.assertEqual(list_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(list_res.data["count"], 1)
+        self.assertEqual(list_res.data["total_items"], 2)
+        self.assertEqual(list_res.data["total_amount"], 900000)
+        self.assertEqual(list_res.data["currency"], "INR")
+
+    def test_cart_isolation_between_customers(self):
+        # User 1 adds item
+        self.client1.post("/api/cart/", {"product_slug": self.product.slug, "quantity": 1}, format="json")
+
+        # User 2 should have empty cart
+        res2 = self.client2.get("/api/cart/")
+        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        self.assertEqual(res2.data["count"], 0)
+        self.assertEqual(res2.data["total_amount"], 0)
+
+    def test_clear_cart(self):
+        self.client1.post("/api/cart/", {"product_slug": self.product.slug, "quantity": 1}, format="json")
+        clear_res = self.client1.post("/api/cart/clear/")
+        self.assertEqual(clear_res.status_code, status.HTTP_200_OK)
+
+        list_res = self.client1.get("/api/cart/")
+        self.assertEqual(list_res.data["count"], 0)
+
+
+class WishlistAPITestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="wishlist_fan@example.com",
+            email="wishlist_fan@example.com",
+            password="Password123!"
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        self.product = Product.objects.create(
+            name="Brutalist Lounge Chair",
+            slug="brutalist-lounge-chair",
+            category="Seating Collection",
+            price="₹2,75,000",
+            numeric_price=275000,
+            image="/images/products/chair.jpg",
+            available=True
+        )
+
+    def test_anonymous_cannot_access_wishlist(self):
+        anon_client = APIClient()
+        res = anon_client.get("/api/wishlist/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_add_and_list_wishlist(self):
+        add_res = self.client.post("/api/wishlist/", {"product_slug": self.product.slug}, format="json")
+        self.assertEqual(add_res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(add_res.data["created"])
+
+        list_res = self.client.get("/api/wishlist/")
+        self.assertEqual(list_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(list_res.data), 1)
+        self.assertEqual(list_res.data[0]["product_details"]["slug"], self.product.slug)
+
+    def test_toggle_wishlist_item(self):
+        # Toggle on
+        t1 = self.client.post("/api/wishlist/toggle/", {"product_slug": self.product.slug}, format="json")
+        self.assertEqual(t1.status_code, status.HTTP_200_OK)
+        self.assertTrue(t1.data["in_wishlist"])
+
+        # Toggle off
+        t2 = self.client.post("/api/wishlist/toggle/", {"product_slug": self.product.slug}, format="json")
+        self.assertEqual(t2.status_code, status.HTTP_200_OK)
+        self.assertFalse(t2.data["in_wishlist"])
+
+
+class MyOrdersAPITestCase(TestCase):
+    def setUp(self):
+        self.customer = User.objects.create_user(
+            username="order_owner@example.com",
+            email="order_owner@example.com",
+            password="Password123!"
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.customer)
+
+        self.other_customer = User.objects.create_user(
+            username="other_customer@example.com",
+            email="other_customer@example.com",
+            password="Password123!"
+        )
+        self.other_client = APIClient()
+        self.other_client.force_authenticate(user=self.other_customer)
+
+        self.product = Product.objects.create(
+            name="Alabaster Pendant Luminaire",
+            slug="alabaster-pendant-luminaire",
+            category="Architectural Lighting",
+            price="₹1,85,000",
+            numeric_price=185000,
+            image="/images/products/luminaire.jpg",
+            available=True
+        )
+
+        from products.models import Order
+        self.order1 = Order.objects.create(
+            order_number="DT-ORD-OWNER01",
+            user=self.customer,
+            product=self.product,
+            quantity=1,
+            unit_price=185000,
+            total_amount=185000,
+            customer_name="Order Owner",
+            customer_email="order_owner@example.com",
+            customer_phone="+91 99999 11111",
+            delivery_address="Penthouse 4B",
+            city="Bengaluru",
+            state="Karnataka",
+            postal_code="560001",
+            status="Pending"
+        )
+
+        self.order2 = Order.objects.create(
+            order_number="DT-ORD-OTHER02",
+            user=self.other_customer,
+            product=self.product,
+            quantity=1,
+            unit_price=185000,
+            total_amount=185000,
+            customer_name="Other Customer",
+            customer_email="other_customer@example.com",
+            customer_phone="+91 88888 22222",
+            delivery_address="Apartment 10A",
+            city="Mumbai",
+            state="Maharashtra",
+            postal_code="400001",
+            status="Confirmed"
+        )
+
+    def test_customer_only_retrieves_own_orders(self):
+        res = self.client.get("/api/orders/my-orders/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data["success"])
+        self.assertEqual(res.data["count"], 1)
+        self.assertEqual(res.data["data"][0]["order_number"], "DT-ORD-OWNER01")
+
+    def test_other_customer_cannot_see_different_customer_orders(self):
+        res = self.other_client.get("/api/orders/my-orders/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["count"], 1)
+        self.assertEqual(res.data["data"][0]["order_number"], "DT-ORD-OTHER02")

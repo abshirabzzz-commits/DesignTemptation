@@ -12,6 +12,7 @@ urlpatterns = [
     path('health/', health_check, name='health-check'),
     path('api/health/', health_check, name='api-health-check'),
     path('admin/', admin.site.urls),
+    path('api/', include('accounts.urls')),
     path('api/', include('enquiries.urls')),
     path('api/', include('projects.urls')),
     path('api/', include('products.urls')),

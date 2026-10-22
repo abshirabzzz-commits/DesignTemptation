@@ -70,6 +70,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { AuthProvider } from "@/components/AuthProvider";
+import { AuthModal } from "@/components/AuthModal";
+
 export default function RootLayout({
   children,
 }: {
@@ -106,9 +109,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#FAF8F5] text-[#1A1A1A] font-sans antialiased selection:bg-[#1A1A1A] selection:text-[#FAF8F5]" suppressHydrationWarning>
-        {children}
+        <AuthProvider>
+          <AuthModal />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
 }
-

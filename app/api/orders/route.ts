@@ -151,9 +151,15 @@ export async function POST(request: NextRequest) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
+        const outgoingHeaders: Record<string, string> = { "Content-Type": "application/json" };
+        const authHeader = request.headers.get("authorization");
+        if (authHeader) {
+          outgoingHeaders["Authorization"] = authHeader;
+        }
+
         await fetch(djangoOrdersUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: outgoingHeaders,
           body: JSON.stringify({
             order_number: orderNumber,
             product_slug: product.slug,
@@ -169,6 +175,7 @@ export async function POST(request: NextRequest) {
           }),
           signal: controller.signal,
         });
+
         clearTimeout(timeoutId);
       } catch {
         console.error("Django order persistence proxy unavailable");
