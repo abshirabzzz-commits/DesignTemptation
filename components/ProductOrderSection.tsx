@@ -68,6 +68,12 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
     e.preventDefault();
     if (isSubmitting) return;
 
+    if (!isAuthenticated) {
+      setServerError("Please log in or create an account to place your order.");
+      openAuthModal("signin", "Please log in or create an account to place your order.");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrors({});
     setServerError(null);
@@ -212,10 +218,6 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
             <button
               type="button"
               onClick={async () => {
-                if (!isAuthenticated) {
-                  openAuthModal("signin");
-                  return;
-                }
                 const res = await apiAddToCart(product.slug, 1);
                 if (res.success) {
                   await refreshCart();
@@ -465,6 +467,18 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
           </div>
 
           <div className="pt-2 border-t border-[#ECE7DF] space-y-2.5">
+            {!isAuthenticated && (
+              <div className="p-3 bg-[#FAF8F5] border border-[#ECE7DF] text-xs text-[#5A5752] flex items-center justify-between">
+                <span>Please log in or create an account to place your order.</span>
+                <button
+                  type="button"
+                  onClick={() => openAuthModal("signin", "Please log in or create an account to place your order.")}
+                  className="text-[11px] uppercase tracking-wider text-[#171615] font-semibold underline underline-offset-2 ml-2 shrink-0"
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}

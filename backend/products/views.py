@@ -60,13 +60,21 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
     def get_permissions(self):
-        if self.action == 'create':
-            return [permissions.AllowAny()]
-        if self.action == 'my_orders':
+        if self.action in ['create', 'my_orders']:
             return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
 
     def create(self, request, *args, **kwargs):
+        if not request.user or not request.user.is_authenticated:
+            return Response(
+                {
+                    "success": False,
+                    "detail": "Authentication credentials were not provided.",
+                    "message": "Please log in or create an account to place your order."
+                },
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         serializer = self.get_serializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
             return Response(
@@ -78,7 +86,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        order = serializer.save()
+        order = serializer.save(user=request.user)
         return Response(
             {
                 "success": True,

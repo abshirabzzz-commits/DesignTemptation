@@ -17,14 +17,59 @@ describe("Product Order Flow & Validation Suite", () => {
     notes: "Please call 2 hours prior to scheduled white-glove arrival.",
   };
 
+  const validAuthHeaders = {
+    "Content-Type": "application/json",
+    "Authorization": "Token test-valid-authenticated-customer-token",
+  };
+
   // ===========================================================================
-  // 1. INPUT VALIDATION TESTS
+  // 1. AUTHENTICATION ENFORCEMENT TESTS (GUEST REJECTION)
   // ===========================================================================
-  describe("Order Input Validation", () => {
-    it("should reject empty order submission with 400 and field errors", async () => {
+  describe("Order Authentication Enforcement", () => {
+    it("should reject guest order submission with 401 Unauthorized when Authorization header is missing", async () => {
       const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validOrderPayload),
+      });
+
+      assert.equal(res.status, 401);
+      const data = await res.json();
+      assert.equal(data.success, false);
+      assert.equal(data.message, "Please log in or create an account to place your order.");
+    });
+
+    it("should reject order submission with empty or malformed Authorization header with 401", async () => {
+      const resEmpty = await fetch(`${BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "   ",
+        },
+        body: JSON.stringify(validOrderPayload),
+      });
+      assert.equal(resEmpty.status, 401);
+
+      const resMalformed = await fetch(`${BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "InvalidSchemeTokenWithoutSpace",
+        },
+        body: JSON.stringify(validOrderPayload),
+      });
+      assert.equal(resMalformed.status, 401);
+    });
+  });
+
+  // ===========================================================================
+  // 2. INPUT VALIDATION TESTS (AUTHENTICATED)
+  // ===========================================================================
+  describe("Order Input Validation (Authenticated)", () => {
+    it("should reject empty order submission with 400 and field errors", async () => {
+      const res = await fetch(`${BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: validAuthHeaders,
         body: JSON.stringify({}),
       });
 
@@ -42,7 +87,7 @@ describe("Product Order Flow & Validation Suite", () => {
     it("should reject nonexistent product slug with 400", async () => {
       const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           product_slug: "nonexistent-fantasy-sofa",
@@ -58,7 +103,7 @@ describe("Product Order Flow & Validation Suite", () => {
     it("should reject invalid quantity (0, negative, or > 10) with 400", async () => {
       const resZero = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           quantity: 0,
@@ -68,7 +113,7 @@ describe("Product Order Flow & Validation Suite", () => {
 
       const resTooLarge = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           quantity: 50,
@@ -80,7 +125,7 @@ describe("Product Order Flow & Validation Suite", () => {
     it("should reject malformed email with 400", async () => {
       const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           customer_email: "not-an-email",
@@ -96,7 +141,7 @@ describe("Product Order Flow & Validation Suite", () => {
     it("should reject invalid phone number (< 10 digits) with 400", async () => {
       const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           customer_phone: "12345",
@@ -111,13 +156,13 @@ describe("Product Order Flow & Validation Suite", () => {
   });
 
   // ===========================================================================
-  // 2. SERVER-ENFORCED PRICING & ORDER SUCCESS
+  // 3. SERVER-ENFORCED PRICING & ORDER SUCCESS (AUTHENTICATED)
   // ===========================================================================
   describe("Server-Side Pricing & Order Reference", () => {
-    it("should create order with server-computed INR total and return unique reference", async () => {
+    it("should create order with server-computed INR total when authenticated", async () => {
       const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           // Attempt client price tampering
@@ -142,7 +187,7 @@ describe("Product Order Flow & Validation Suite", () => {
   });
 
   // ===========================================================================
-  // 3. PRIVACY & SECURITY
+  // 4. PRIVACY, ACCESS CONTROL & HONEYPOT
   // ===========================================================================
   describe("Access Control & Anti-Spam", () => {
     it("should block public GET access with 403 Forbidden", async () => {
@@ -155,10 +200,10 @@ describe("Product Order Flow & Validation Suite", () => {
       assert.equal(data.success, false);
     });
 
-    it("should silently absorb honeypot spam bots without dispatching", async () => {
+    it("should silently absorb honeypot spam bots when authenticated", async () => {
       const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: validAuthHeaders,
         body: JSON.stringify({
           ...validOrderPayload,
           _hp_website: "http://spambot-trap.com",

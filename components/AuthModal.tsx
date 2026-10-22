@@ -6,7 +6,7 @@ import { X, Eye, EyeOff, Lock, Mail, User, Phone, CheckCircle2, AlertCircle } fr
 import { apiRequestPasswordReset, apiConfirmPasswordReset } from "@/lib/api";
 
 export function AuthModal() {
-  const { isAuthModalOpen, authModalTab, closeAuthModal, login, register, loginWithGoogle } = useAuth();
+  const { isAuthModalOpen, authModalTab, authModalMessage, closeAuthModal, login, register, loginWithGoogle } = useAuth();
 
   const [tab, setTab] = useState<"signin" | "signup" | "forgot">("signin");
   const [showPassword, setShowPassword] = useState(false);
@@ -217,6 +217,14 @@ export function AuthModal() {
             >
               Register
             </button>
+          </div>
+        )}
+
+        {/* Informational Prompt Message */}
+        {authModalMessage && (
+          <div className="p-3 bg-[#FAF8F5] border border-[#ECE7DF] text-[#171615] text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#8C877E] shrink-0" />
+            <span className="font-medium text-[#171615]">{authModalMessage}</span>
           </div>
         )}
 

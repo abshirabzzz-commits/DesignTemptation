@@ -156,7 +156,41 @@ class OrderAPIPermissionsTestCase(TestCase):
         self.staff_client = APIClient()
         self.staff_client.force_authenticate(user=self.staff_user)
 
-    def test_public_can_create_order_with_server_computed_total(self):
+        # Create regular authenticated customer
+        self.customer = User.objects.create_user(
+            username="customer@example.com",
+            email="customer@example.com",
+            password="CustomerPassword123!",
+        )
+        self.customer_client = APIClient()
+        self.customer_client.force_authenticate(user=self.customer)
+
+        # Create secondary customer to test ID spoofing protection
+        self.other_customer = User.objects.create_user(
+            username="other_customer@example.com",
+            email="other_customer@example.com",
+            password="OtherPassword123!",
+        )
+        self.other_client = APIClient()
+        self.other_client.force_authenticate(user=self.other_customer)
+
+    def test_anonymous_cannot_create_order(self):
+        payload = {
+            "product_slug": self.product.slug,
+            "quantity": 2,
+            "customer_name": "Anonymous Guest",
+            "customer_email": "guest@example.com",
+            "customer_phone": "+91 98765 43210",
+            "delivery_address": "Flat 402, Embassy Habitat, Vasanth Nagar",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "postal_code": "560052",
+        }
+        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertFalse(response.data.get("success", False))
+
+    def test_authenticated_customer_can_create_order_with_server_computed_total(self):
         payload = {
             "product_slug": self.product.slug,
             "quantity": 2,
@@ -172,7 +206,7 @@ class OrderAPIPermissionsTestCase(TestCase):
             "unit_price": 100,
             "total_amount": 200,
         }
-        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        response = self.customer_client.post("/api/orders/", payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
 
@@ -183,6 +217,34 @@ class OrderAPIPermissionsTestCase(TestCase):
         self.assertEqual(data["currency"], "INR")
         self.assertEqual(data["status"], "Pending")
         self.assertTrue(data["order_number"].startswith("DT-ORD-"))
+
+        # Verify order is strictly associated with authenticated customer
+        from products.models import Order
+        order = Order.objects.get(order_number=data["order_number"])
+        self.assertEqual(order.user, self.customer)
+
+    def test_customer_cannot_spoof_different_user_id(self):
+        payload = {
+            "product_slug": self.product.slug,
+            "quantity": 1,
+            "customer_name": "Spoof Attempt",
+            "customer_email": "customer@example.com",
+            "customer_phone": "+91 98765 43210",
+            "delivery_address": "100 MG Road",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "postal_code": "560001",
+            # Attempt to associate order with another customer's ID
+            "user": self.other_customer.id,
+            "user_id": self.other_customer.id,
+        }
+        response = self.customer_client.post("/api/orders/", payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        from products.models import Order
+        created_order = Order.objects.get(order_number=response.data["data"]["order_number"])
+        self.assertEqual(created_order.user, self.customer)
+        self.assertNotEqual(created_order.user, self.other_customer)
 
     def test_cannot_order_unavailable_product(self):
         payload = {
@@ -196,7 +258,7 @@ class OrderAPIPermissionsTestCase(TestCase):
             "state": "Karnataka",
             "postal_code": "560025",
         }
-        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        response = self.customer_client.post("/api/orders/", payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_rejects_invalid_quantity(self):
@@ -211,7 +273,7 @@ class OrderAPIPermissionsTestCase(TestCase):
             "state": "Karnataka",
             "postal_code": "560025",
         }
-        response = self.anonymous_client.post("/api/orders/", payload, format="json")
+        response = self.customer_client.post("/api/orders/", payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_anonymous_cannot_list_orders(self):
@@ -249,6 +311,32 @@ class OrderAPIPermissionsTestCase(TestCase):
         self.assertEqual(patch_res.status_code, status.HTTP_200_OK)
         order.refresh_from_db()
         self.assertEqual(order.status, "Confirmed")
+
+    def test_legacy_orders_with_null_user_are_preserved(self):
+        from products.models import Order
+        legacy_order = Order.objects.create(
+            order_number="DT-ORD-LEGACY-01",
+            product=self.product,
+            user=None,  # Legacy guest order
+            quantity=1,
+            unit_price=640000,
+            total_amount=640000,
+            customer_name="Legacy Customer",
+            customer_email="customer@example.com",
+            customer_phone="+91 98765 00000",
+            delivery_address="Legacy Address",
+            city="Bengaluru",
+            state="Karnataka",
+            postal_code="560001",
+            status="Pending",
+        )
+        self.assertIsNone(legacy_order.user)
+
+        # Matching customer can see legacy order through email association in my-orders
+        res = self.customer_client.get("/api/orders/my-orders/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        order_numbers = [o["order_number"] for o in res.data["data"]]
+        self.assertIn("DT-ORD-LEGACY-01", order_numbers)
 
 
 class CartAPITestCase(TestCase):

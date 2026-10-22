@@ -45,7 +45,30 @@ export async function POST(request: NextRequest) {
   try {
     const rawData = await request.json().catch(() => ({})) as Partial<OrderInputFields>;
 
-    // 1. Spam protection: silent absorption of honeypot traps
+    // 1. Enforce authentication: Customers MUST be logged in to place or confirm an order
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Please log in or create an account to place your order.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const tokenMatch = authHeader.trim().match(/^(?:Token|Bearer)\s+(.+)$/i);
+    if (!tokenMatch || !tokenMatch[1]?.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Please log in or create an account to place your order.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // 2. Spam protection: silent absorption of honeypot traps
     const honeypot = rawData._hp_website || rawData.website_url || rawData._gotcha;
     if (honeypot && typeof honeypot === "string" && honeypot.trim().length > 0) {
       return NextResponse.json(
@@ -157,7 +180,7 @@ export async function POST(request: NextRequest) {
           outgoingHeaders["Authorization"] = authHeader;
         }
 
-        await fetch(djangoOrdersUrl, {
+        const djangoRes = await fetch(djangoOrdersUrl, {
           method: "POST",
           headers: outgoingHeaders,
           body: JSON.stringify({
@@ -177,6 +200,18 @@ export async function POST(request: NextRequest) {
         });
 
         clearTimeout(timeoutId);
+
+        if (djangoRes.status === 401 || djangoRes.status === 403) {
+          const djangoData = await djangoRes.json().catch(() => ({}));
+          return NextResponse.json(
+            {
+              success: false,
+              message: djangoData.message || "Please log in or create an account to place your order.",
+              detail: djangoData.detail,
+            },
+            { status: 401 }
+          );
+        }
       } catch {
         console.error("Django order persistence proxy unavailable");
       }

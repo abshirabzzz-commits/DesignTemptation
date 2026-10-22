@@ -1,4 +1,5 @@
 import { AuthUser, CartItem, WishlistItem, OrderRecord } from "@/types";
+import { PRODUCTS } from "@/data/content";
 
 const DJANGO_URL = (process.env.NEXT_PUBLIC_DJANGO_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
 
@@ -126,9 +127,107 @@ export async function apiConfirmPasswordReset(payload: { uid: string; token: str
 }
 
 // ---------------------------------------------------------------------------
-// Cart API Calls
+// Cart API Calls & Guest Cart Persistence
 // ---------------------------------------------------------------------------
+const GUEST_CART_KEY = "dt_guest_cart";
+
+interface LocalGuestItem {
+  id: number;
+  product_slug: string;
+  quantity: number;
+}
+
+export function getGuestCart(): LocalGuestItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(GUEST_CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function setGuestCart(items: LocalGuestItem[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+}
+
+export function clearGuestCart() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(GUEST_CART_KEY);
+}
+
+export async function syncGuestCartToServer() {
+  const token = getStoredToken();
+  if (!token) return;
+
+  const guestItems = getGuestCart();
+  if (!guestItems || guestItems.length === 0) return;
+
+  for (const item of guestItems) {
+    try {
+      await apiFetch(`/api/cart/`, {
+        method: "POST",
+        body: JSON.stringify({ product_slug: item.product_slug, quantity: item.quantity }),
+      });
+    } catch {
+      // Continue syncing remaining items
+    }
+  }
+  clearGuestCart();
+}
+
 export async function apiGetCart() {
+  const token = getStoredToken();
+  if (!token) {
+    const localItems = getGuestCart();
+    const items: CartItem[] = [];
+    let total_amount = 0;
+    let total_items = 0;
+
+    for (const lItem of localItems) {
+      const prod = PRODUCTS.find((p) => p.slug === lItem.product_slug);
+      if (prod) {
+        const subtotal = (prod.numericPrice || 0) * lItem.quantity;
+        total_amount += subtotal;
+        total_items += lItem.quantity;
+        items.push({
+          id: lItem.id,
+          product: 0,
+          product_details: {
+            id: prod.id,
+            slug: prod.slug,
+            name: prod.name,
+            category: prod.category,
+            price: prod.price,
+            numericPrice: prod.numericPrice,
+            image: prod.image,
+            imageAlt: prod.imageAlt,
+            dimensions: prod.dimensions,
+            material: prod.material,
+            description: prod.description,
+            featured: prod.featured,
+            available: prod.available,
+            createdAt: "",
+          },
+          quantity: lItem.quantity,
+          subtotal,
+          created_at: "",
+          updated_at: "",
+        });
+      }
+    }
+
+    return {
+      success: true,
+      count: items.length,
+      total_items,
+      total_amount,
+      currency: "INR",
+      items,
+    };
+  }
+
   return apiFetch<{
     count: number;
     total_items: number;
@@ -139,6 +238,23 @@ export async function apiGetCart() {
 }
 
 export async function apiAddToCart(productSlug: string, quantity: number = 1) {
+  const token = getStoredToken();
+  if (!token) {
+    const localItems = getGuestCart();
+    const existing = localItems.find((i) => i.product_slug === productSlug);
+    if (existing) {
+      existing.quantity = Math.min(10, existing.quantity + quantity);
+    } else {
+      localItems.push({
+        id: Date.now(),
+        product_slug: productSlug,
+        quantity: Math.min(10, quantity),
+      });
+    }
+    setGuestCart(localItems);
+    return { success: true };
+  }
+
   return apiFetch<{ data: CartItem }>(`/api/cart/`, {
     method: "POST",
     body: JSON.stringify({ product_slug: productSlug, quantity }),
@@ -146,6 +262,17 @@ export async function apiAddToCart(productSlug: string, quantity: number = 1) {
 }
 
 export async function apiUpdateCartItem(itemId: number, quantity: number) {
+  const token = getStoredToken();
+  if (!token) {
+    const localItems = getGuestCart();
+    const item = localItems.find((i) => i.id === itemId);
+    if (item) {
+      item.quantity = Math.min(10, Math.max(1, quantity));
+      setGuestCart(localItems);
+    }
+    return { success: true };
+  }
+
   return apiFetch<{ data: CartItem }>(`/api/cart/${itemId}/`, {
     method: "PATCH",
     body: JSON.stringify({ quantity }),
@@ -153,12 +280,25 @@ export async function apiUpdateCartItem(itemId: number, quantity: number) {
 }
 
 export async function apiRemoveCartItem(itemId: number) {
+  const token = getStoredToken();
+  if (!token) {
+    const localItems = getGuestCart().filter((i) => i.id !== itemId);
+    setGuestCart(localItems);
+    return { success: true };
+  }
+
   return apiFetch(`/api/cart/${itemId}/`, {
     method: "DELETE",
   });
 }
 
 export async function apiClearCart() {
+  const token = getStoredToken();
+  if (!token) {
+    clearGuestCart();
+    return { success: true };
+  }
+
   return apiFetch(`/api/cart/clear/`, {
     method: "POST",
   });

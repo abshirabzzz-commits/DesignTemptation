@@ -13,6 +13,7 @@ import {
   apiUpdateCartItem,
   apiRemoveCartItem,
   apiClearCart,
+  getStoredToken,
 } from "@/lib/api";
 import {
   ShoppingBag,
@@ -63,21 +64,17 @@ export default function CartPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadCart();
-      if (user) {
-        setName(user.full_name || "");
-        setEmail(user.email || "");
-        if (user.profile) {
-          setPhone(user.profile.phone || "");
-          setAddress(user.profile.delivery_address || "");
-          if (user.profile.city) setCity(user.profile.city);
-          if (user.profile.state) setState(user.profile.state);
-          if (user.profile.postal_code) setPostalCode(user.profile.postal_code);
-        }
+    loadCart();
+    if (isAuthenticated && user) {
+      setName(user.full_name || "");
+      setEmail(user.email || "");
+      if (user.profile) {
+        setPhone(user.profile.phone || "");
+        setAddress(user.profile.delivery_address || "");
+        if (user.profile.city) setCity(user.profile.city);
+        if (user.profile.state) setState(user.profile.state);
+        if (user.profile.postal_code) setPostalCode(user.profile.postal_code);
       }
-    } else {
-      setIsLoading(false);
     }
   }, [isAuthenticated, user]);
 
@@ -116,6 +113,12 @@ export default function CartPage() {
     e.preventDefault();
     if (checkoutSubmitting || items.length === 0) return;
 
+    if (!isAuthenticated) {
+      setCheckoutError("Please log in or create an account to place your order.");
+      openAuthModal("signin", "Please log in or create an account to place your order.");
+      return;
+    }
+
     setCheckoutSubmitting(true);
     setCheckoutError(null);
 
@@ -136,9 +139,15 @@ export default function CartPage() {
         notes: notes ? `${notes} [Batch acquisition: ${items.length} piece(s)]` : `[Batch acquisition: ${items.length} piece(s)]`,
       };
 
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const token = getStoredToken();
+      if (token) {
+        headers["Authorization"] = `Token ${token}`;
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(payload),
       });
 
@@ -180,24 +189,7 @@ export default function CartPage() {
             </h1>
           </div>
 
-          {!isAuthenticated ? (
-            <div className="p-12 text-center border border-[#ECE7DF] bg-white space-y-4 max-w-lg mx-auto">
-              <ShoppingBag className="w-8 h-8 text-[#8C877E] mx-auto stroke-[1.2]" />
-              <div className="space-y-1">
-                <h2 className="font-serif text-xl text-[#171615]">Sign in to access your cart</h2>
-                <p className="text-xs text-[#5A5752] font-light">
-                  Your cart is securely synchronized with your private Design Temptation account.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => openAuthModal("signin")}
-                className="btn-primary !h-11 text-xs font-semibold tracking-[0.16em] uppercase px-8"
-              >
-                Sign In / Register
-              </button>
-            </div>
-          ) : isLoading ? (
+          {isLoading ? (
             <div className="py-20 text-center text-xs text-[#8C877E] uppercase tracking-widest">
               <span className="inline-block w-4 h-4 border-2 border-[#171615]/30 border-t-[#171615] rounded-full animate-spin mr-2 align-middle" />
               Loading your curated pieces...
@@ -208,15 +200,26 @@ export default function CartPage() {
               <div className="space-y-1">
                 <h2 className="font-serif text-xl text-[#171615]">Your cart is empty</h2>
                 <p className="text-xs text-[#5A5752] font-light">
-                  Explore our limited studio collection to reserve architectural furniture and lighting.
+                  Explore our limited studio collection or sign in to access your saved pieces.
                 </p>
               </div>
-              <Link
-                href="/products"
-                className="btn-primary inline-flex items-center justify-center !h-11 text-xs font-semibold tracking-[0.16em] uppercase px-8"
-              >
-                Explore Collection
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                <Link
+                  href="/products"
+                  className="btn-primary inline-flex items-center justify-center !h-11 text-xs font-semibold tracking-[0.16em] uppercase px-8"
+                >
+                  Explore Collection
+                </Link>
+                {!isAuthenticated && (
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal("signin")}
+                    className="py-2.5 px-6 border border-[#171615] text-[#171615] text-xs font-semibold tracking-[0.16em] uppercase hover:bg-[#FAF8F5]"
+                  >
+                    Sign In
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -335,14 +338,35 @@ export default function CartPage() {
                 </div>
 
                 {!isCheckingOut ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsCheckingOut(true)}
-                    className="btn-primary w-full !h-12 text-xs font-semibold tracking-[0.16em] uppercase flex items-center justify-center gap-2"
-                  >
-                    <span>Proceed to Delivery Details</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  <div className="space-y-3">
+                    {!isAuthenticated && (
+                      <div className="p-3 bg-[#FAF8F5] border border-[#ECE7DF] text-xs text-[#5A5752] flex items-center justify-between">
+                        <span>Please log in or create an account to place your order.</span>
+                        <button
+                          type="button"
+                          onClick={() => openAuthModal("signin", "Please log in or create an account to place your order.")}
+                          className="text-[11px] uppercase tracking-wider text-[#171615] font-semibold underline underline-offset-2 ml-2 shrink-0"
+                        >
+                          Sign In
+                        </button>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          setCheckoutError("Please log in or create an account to place your order.");
+                          openAuthModal("signin", "Please log in or create an account to place your order.");
+                          return;
+                        }
+                        setIsCheckingOut(true);
+                      }}
+                      className="btn-primary w-full !h-12 text-xs font-semibold tracking-[0.16em] uppercase flex items-center justify-center gap-2"
+                    >
+                      <span>Proceed to Delivery Details</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 ) : (
                   <form onSubmit={handleCheckoutSubmit} className="space-y-4 pt-2 border-t border-[#ECE7DF]">
                     <p className="text-xs uppercase tracking-wider font-semibold text-[#171615]">
@@ -455,6 +479,19 @@ export default function CartPage() {
                         className="w-full bg-[#FAF8F5] border border-[#ECE7DF] px-3 py-2 text-xs"
                       />
                     </div>
+
+                    {!isAuthenticated && (
+                      <div className="p-3 bg-[#FAF8F5] border border-[#ECE7DF] text-xs text-[#5A5752] flex items-center justify-between">
+                        <span>Please log in or create an account to place your order.</span>
+                        <button
+                          type="button"
+                          onClick={() => openAuthModal("signin", "Please log in or create an account to place your order.")}
+                          className="text-[11px] uppercase tracking-wider text-[#171615] font-semibold underline underline-offset-2 ml-2 shrink-0"
+                        >
+                          Sign In
+                        </button>
+                      </div>
+                    )}
 
                     <div className="flex gap-2 pt-2">
                       <button

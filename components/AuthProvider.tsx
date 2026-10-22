@@ -13,6 +13,7 @@ import {
   apiGetWishlist,
   getStoredToken,
   setStoredToken,
+  syncGuestCartToServer,
 } from "@/lib/api";
 
 interface AuthContextType {
@@ -30,7 +31,8 @@ interface AuthContextType {
   refreshWishlist: () => Promise<void>;
   isAuthModalOpen: boolean;
   authModalTab: "signin" | "signup" | "forgot";
-  openAuthModal: (tab?: "signin" | "signup" | "forgot") => void;
+  authModalMessage: string | null;
+  openAuthModal: (tab?: "signin" | "signup" | "forgot", message?: string) => void;
   closeAuthModal: () => void;
 }
 
@@ -44,14 +46,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<"signin" | "signup" | "forgot">("signin");
+  const [authModalMessage, setAuthModalMessage] = useState<string | null>(null);
 
-  const openAuthModal = useCallback((tab: "signin" | "signup" | "forgot" = "signin") => {
+  const openAuthModal = useCallback((tab: "signin" | "signup" | "forgot" = "signin", message?: string) => {
     setAuthModalTab(tab);
+    setAuthModalMessage(message || null);
     setIsAuthModalOpen(true);
   }, []);
 
   const closeAuthModal = useCallback(() => {
     setIsAuthModalOpen(false);
+    setAuthModalMessage(null);
   }, []);
 
   const refreshCart = useCallback(async () => {
@@ -111,6 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStoredToken(res.token);
       setUser(res.user);
       setIsAuthModalOpen(false);
+      setAuthModalMessage(null);
+      await syncGuestCartToServer();
       await Promise.all([refreshCart(), refreshWishlist()]);
       return { success: true };
     }
@@ -127,6 +134,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStoredToken(res.token);
       setUser(res.user);
       setIsAuthModalOpen(false);
+      setAuthModalMessage(null);
+      await syncGuestCartToServer();
       await Promise.all([refreshCart(), refreshWishlist()]);
       return { success: true };
     }
@@ -143,6 +152,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStoredToken(res.token);
       setUser(res.user);
       setIsAuthModalOpen(false);
+      setAuthModalMessage(null);
+      await syncGuestCartToServer();
       await Promise.all([refreshCart(), refreshWishlist()]);
       return { success: true };
     }
@@ -194,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshWishlist,
         isAuthModalOpen,
         authModalTab,
+        authModalMessage,
         openAuthModal,
         closeAuthModal,
       }}

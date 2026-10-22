@@ -147,9 +147,11 @@ class OrderSerializer(serializers.ModelSerializer):
             random_suffix = uuid.uuid4().hex[:6].upper()
             attrs['order_number'] = f"DT-ORD-{random_suffix}"
 
-        # Associate authenticated user if present in request context
-        request = self.context.get('request')
-        if request and request.user and request.user.is_authenticated and self.instance is None:
+        # Enforce authenticated customer association on order creation — never trust client-supplied user
+        if self.instance is None:
+            request = self.context.get('request')
+            if not request or not request.user or not request.user.is_authenticated:
+                raise serializers.ValidationError({"detail": "Authentication credentials were not provided."})
             attrs['user'] = request.user
 
         return attrs
