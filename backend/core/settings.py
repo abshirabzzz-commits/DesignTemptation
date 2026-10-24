@@ -250,38 +250,52 @@ GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', os.environ.get('GOOGLE_OAU
 # ==============================================================================
 # CORS & CSRF Settings
 # ==============================================================================
+DEFAULT_FRONTEND_ORIGINS = [
+    'https://designtemptation.com',
+    'https://www.designtemptation.com',
+    'https://design-temptation.vercel.app',
+    'https://interior-studio.vercel.app',
+]
+
 cors_origins_env = os.environ.get('DJANGO_CORS_ALLOWED_ORIGINS')
 if cors_origins_env:
-    CORS_ALLOWED_ORIGINS = [
+    parsed_origins = [
         origin.strip() for origin in cors_origins_env.split(',') if origin.strip()
     ]
+    CORS_ALLOWED_ORIGINS = list(dict.fromkeys(parsed_origins + DEFAULT_FRONTEND_ORIGINS))
     CORS_ALLOW_ALL_ORIGINS = False
 elif DEBUG:
-    # Local Next.js development origins
+    # Local Next.js development origins + production origins
     CORS_ALLOWED_ORIGINS = [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-    ]
+    ] + DEFAULT_FRONTEND_ORIGINS
     CORS_ALLOW_ALL_ORIGINS = False
 else:
-    CORS_ALLOWED_ORIGINS = []
+    CORS_ALLOWED_ORIGINS = list(DEFAULT_FRONTEND_ORIGINS)
     CORS_ALLOW_ALL_ORIGINS = False
+
+# Allow Vercel preview or branch deployments specifically for Design Temptation projects
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/(design-temptation|interior-studio)(-[a-z0-9-]+)?\.vercel\.app$",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
 
 csrf_trusted_env = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS')
 if csrf_trusted_env:
-    CSRF_TRUSTED_ORIGINS = [
+    parsed_csrf = [
         origin.strip() for origin in csrf_trusted_env.split(',') if origin.strip()
     ]
+    CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(parsed_csrf + DEFAULT_FRONTEND_ORIGINS))
 elif DEBUG:
     CSRF_TRUSTED_ORIGINS = [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-    ]
+    ] + DEFAULT_FRONTEND_ORIGINS
 else:
-    CSRF_TRUSTED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = list(DEFAULT_FRONTEND_ORIGINS)
 
 if render_hostname:
     render_origin = f'https://{render_hostname}'

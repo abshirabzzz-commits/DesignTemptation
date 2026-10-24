@@ -55,3 +55,7 @@ backend/staticfiles/
 data/enquiries.json
 data/enquiries*.json
 
+# local developer tooling and IDE
+.vscode/
+pyrefly.toml
+

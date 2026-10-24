@@ -1,6 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
+import { CheckCircle2, X } from "lucide-react";
 import { AuthUser } from "@/types";
 import {
   apiGetMe,
@@ -10,11 +12,18 @@ import {
   apiLogout,
   apiUpdateProfile,
   apiGetCart,
+  apiAddToCart,
   apiGetWishlist,
   getStoredToken,
   setStoredToken,
   syncGuestCartToServer,
 } from "@/lib/api";
+
+export interface PendingCartItem {
+  slug: string;
+  quantity: number;
+  name?: string;
+}
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -34,6 +43,10 @@ interface AuthContextType {
   authModalMessage: string | null;
   openAuthModal: (tab?: "signin" | "signup" | "forgot", message?: string) => void;
   closeAuthModal: () => void;
+  addToCart: (productSlug: string, quantity?: number, productName?: string) => Promise<{ success: boolean; message?: string; requiresAuth?: boolean }>;
+  cartFeedback: string | null;
+  clearCartFeedback: () => void;
+  pendingCartItem: PendingCartItem | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,6 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authModalTab, setAuthModalTab] = useState<"signin" | "signup" | "forgot">("signin");
   const [authModalMessage, setAuthModalMessage] = useState<string | null>(null);
 
+  const [pendingCartItem, setPendingCartItem] = useState<PendingCartItem | null>(null);
+  const [cartFeedback, setCartFeedback] = useState<string | null>(null);
+  const isAddingRef = useRef(false);
+
+  const clearCartFeedback = useCallback(() => {
+    setCartFeedback(null);
+  }, []);
+
   const openAuthModal = useCallback((tab: "signin" | "signup" | "forgot" = "signin", message?: string) => {
     setAuthModalTab(tab);
     setAuthModalMessage(message || null);
@@ -57,6 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const closeAuthModal = useCallback(() => {
     setIsAuthModalOpen(false);
     setAuthModalMessage(null);
+    // User cancelled authentication: discard pending cart addition
+    setPendingCartItem(null);
   }, []);
 
   const refreshCart = useCallback(async () => {
@@ -80,6 +103,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setWishlistCount(res.data.length);
     }
   }, []);
+
+  // Helper to execute pending cart addition immediately following successful authentication
+  const executePendingCartAddition = useCallback(async () => {
+    if (!pendingCartItem) return;
+    const itemToAdd = pendingCartItem;
+    // Clear pendingCartItem immediately to prevent duplicate additions
+    setPendingCartItem(null);
+
+    try {
+      const res = await apiAddToCart(itemToAdd.slug, itemToAdd.quantity);
+      if (res.success) {
+        const msg = `Added ${itemToAdd.name || "piece"} to your cart.`;
+        setCartFeedback(msg);
+        setTimeout(() => setCartFeedback(null), 5000);
+      }
+    } catch {
+      // Continue gracefully
+    }
+  }, [pendingCartItem]);
 
   // Initial authentication check
   useEffect(() => {
@@ -110,6 +152,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, [refreshCart, refreshWishlist]);
 
+  const addToCart = useCallback(async (productSlug: string, quantity: number = 1, productName?: string) => {
+    if (isAddingRef.current) {
+      return { success: false, message: "Addition in progress..." };
+    }
+
+    const token = getStoredToken();
+    if (!token || !user) {
+      // Remember selected product and quantity while authentication is in progress
+      setPendingCartItem({ slug: productSlug, quantity, name: productName });
+      openAuthModal("signin", "Please sign in or create an atelier account to add items to your cart.");
+      return { success: false, requiresAuth: true };
+    }
+
+    isAddingRef.current = true;
+    try {
+      const res = await apiAddToCart(productSlug, quantity);
+      if (res.success) {
+        await refreshCart();
+        const successMsg = `Added ${productName || "piece"} to your cart.`;
+        setCartFeedback(successMsg);
+        setTimeout(() => setCartFeedback(null), 4000);
+        return { success: true, message: successMsg };
+      }
+      return { success: false, message: res.message || "Failed to add piece to cart." };
+    } finally {
+      isAddingRef.current = false;
+    }
+  }, [user, openAuthModal, refreshCart]);
+
   const login = async (email: string, password: string) => {
     const res = await apiLogin({ email, password });
     if (res.success && res.token && res.user) {
@@ -118,6 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthModalOpen(false);
       setAuthModalMessage(null);
       await syncGuestCartToServer();
+      await executePendingCartAddition();
       await Promise.all([refreshCart(), refreshWishlist()]);
       return { success: true };
     }
@@ -136,6 +208,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthModalOpen(false);
       setAuthModalMessage(null);
       await syncGuestCartToServer();
+      await executePendingCartAddition();
       await Promise.all([refreshCart(), refreshWishlist()]);
       return { success: true };
     }
@@ -154,6 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthModalOpen(false);
       setAuthModalMessage(null);
       await syncGuestCartToServer();
+      await executePendingCartAddition();
       await Promise.all([refreshCart(), refreshWishlist()]);
       return { success: true };
     }
@@ -173,6 +247,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setCartCount(0);
     setWishlistCount(0);
+    setPendingCartItem(null);
+    setCartFeedback(null);
   };
 
   const updateProfile = async (data: any) => {
@@ -208,9 +284,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         authModalMessage,
         openAuthModal,
         closeAuthModal,
+        addToCart,
+        cartFeedback,
+        clearCartFeedback,
+        pendingCartItem,
       }}
     >
       {children}
+
+      {/* Floating Studio Notification Toast for Cart Confirmations */}
+      {cartFeedback && (
+        <aside
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 max-w-sm sm:max-w-md bg-[#171615] text-[#FAF8F5] px-4 sm:px-5 py-3.5 shadow-2xl border border-[#32302D] flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300"
+        >
+          <div className="flex items-center gap-2.5 text-xs font-medium tracking-wide">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{cartFeedback}</span>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Link
+              href="/cart"
+              className="text-[11px] uppercase tracking-wider underline hover:text-[#ECE7DF] transition-colors"
+            >
+              View Cart
+            </Link>
+            <button
+              type="button"
+              onClick={clearCartFeedback}
+              className="text-[#8C877E] hover:text-[#FAF8F5] p-1 transition-colors"
+              aria-label="Dismiss notification"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </aside>
+      )}
     </AuthContext.Provider>
   );
 }

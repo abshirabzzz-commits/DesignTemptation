@@ -16,7 +16,7 @@ import {
 import { Heart, ShoppingBag, Trash2, CheckCircle2 } from "lucide-react";
 
 export default function WishlistPage() {
-  const { isAuthenticated, openAuthModal, refreshCart, refreshWishlist } = useAuth();
+  const { isAuthenticated, openAuthModal, refreshCart, refreshWishlist, addToCart } = useAuth();
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
@@ -49,10 +49,9 @@ export default function WishlistPage() {
   };
 
   const handleAddToCart = async (productSlug: string, productName: string) => {
-    const res = await apiAddToCart(productSlug, 1);
-    if (res.success) {
-      await refreshCart();
-      setActionSuccess(`Added ${productName} to your cart.`);
+    const res = await addToCart(productSlug, 1, productName);
+    if (res.success && res.message) {
+      setActionSuccess(res.message);
       setTimeout(() => setActionSuccess(null), 3000);
     }
   };

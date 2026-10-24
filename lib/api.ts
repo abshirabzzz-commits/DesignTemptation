@@ -1,7 +1,44 @@
 import { AuthUser, CartItem, WishlistItem, OrderRecord } from "@/types";
 import { PRODUCTS } from "@/data/content";
 
-const DJANGO_URL = (process.env.NEXT_PUBLIC_DJANGO_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+export function getDjangoBaseUrl(): string {
+  // 1. If explicit environment variable is defined, normalize it
+  const envUrl = process.env.NEXT_PUBLIC_DJANGO_API_URL;
+  if (envUrl && envUrl.trim()) {
+    let trimmed = envUrl.trim().replace(/\/+$/, "");
+    if (trimmed.endsWith("/api")) {
+      trimmed = trimmed.slice(0, -4);
+    }
+    // If running in browser on a live/remote host, reject localhost to prevent mixed-content failures
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname;
+      if (host !== "localhost" && host !== "127.0.0.1") {
+        if (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) {
+          return "https://designtemptation.onrender.com";
+        }
+      }
+    }
+    return trimmed;
+  }
+
+  // 2. In browser runtime: check hostname
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    // Only fall back to local Django if the visitor is running on localhost/127.0.0.1
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "http://127.0.0.1:8000";
+    }
+    return "https://designtemptation.onrender.com";
+  }
+
+  // 3. Server-side runtime: if in production or on Vercel, use deployed Render API
+  if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
+    return "https://designtemptation.onrender.com";
+  }
+
+  // 4. Local development default
+  return "http://127.0.0.1:8000";
+}
 
 export function getStoredToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -31,8 +68,9 @@ export async function apiFetch<T = any>(
     headers["Authorization"] = `Token ${token}`;
   }
 
+  const baseUrl = getDjangoBaseUrl();
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const url = `${DJANGO_URL}${cleanEndpoint}`;
+  const url = `${baseUrl}${cleanEndpoint}`;
 
   try {
     const res = await fetch(url, {
@@ -56,9 +94,13 @@ export async function apiFetch<T = any>(
       ...data,
     };
   } catch (error: any) {
+    const isNetworkFailure = error?.message === "Failed to fetch" || error?.name === "TypeError";
+    const helpfulMessage = isNetworkFailure
+      ? "Unable to reach studio servers. Please check your network connection or try again shortly."
+      : error?.message || "Network error communicating with studio service.";
     return {
       success: false,
-      message: error?.message || "Network error communicating with studio service.",
+      message: helpfulMessage,
     };
   }
 }
@@ -180,51 +222,13 @@ export async function syncGuestCartToServer() {
 export async function apiGetCart() {
   const token = getStoredToken();
   if (!token) {
-    const localItems = getGuestCart();
-    const items: CartItem[] = [];
-    let total_amount = 0;
-    let total_items = 0;
-
-    for (const lItem of localItems) {
-      const prod = PRODUCTS.find((p) => p.slug === lItem.product_slug);
-      if (prod) {
-        const subtotal = (prod.numericPrice || 0) * lItem.quantity;
-        total_amount += subtotal;
-        total_items += lItem.quantity;
-        items.push({
-          id: lItem.id,
-          product: 0,
-          product_details: {
-            id: prod.id,
-            slug: prod.slug,
-            name: prod.name,
-            category: prod.category,
-            price: prod.price,
-            numericPrice: prod.numericPrice,
-            image: prod.image,
-            imageAlt: prod.imageAlt,
-            dimensions: prod.dimensions,
-            material: prod.material,
-            description: prod.description,
-            featured: prod.featured,
-            available: prod.available,
-            createdAt: "",
-          },
-          quantity: lItem.quantity,
-          subtotal,
-          created_at: "",
-          updated_at: "",
-        });
-      }
-    }
-
     return {
       success: true,
-      count: items.length,
-      total_items,
-      total_amount,
+      count: 0,
+      total_items: 0,
+      total_amount: 0,
       currency: "INR",
-      items,
+      items: [],
     };
   }
 
@@ -240,19 +244,10 @@ export async function apiGetCart() {
 export async function apiAddToCart(productSlug: string, quantity: number = 1) {
   const token = getStoredToken();
   if (!token) {
-    const localItems = getGuestCart();
-    const existing = localItems.find((i) => i.product_slug === productSlug);
-    if (existing) {
-      existing.quantity = Math.min(10, existing.quantity + quantity);
-    } else {
-      localItems.push({
-        id: Date.now(),
-        product_slug: productSlug,
-        quantity: Math.min(10, quantity),
-      });
-    }
-    setGuestCart(localItems);
-    return { success: true };
+    return {
+      success: false,
+      message: "Please sign in to add items to your cart.",
+    };
   }
 
   return apiFetch<{ data: CartItem }>(`/api/cart/`, {
@@ -264,13 +259,7 @@ export async function apiAddToCart(productSlug: string, quantity: number = 1) {
 export async function apiUpdateCartItem(itemId: number, quantity: number) {
   const token = getStoredToken();
   if (!token) {
-    const localItems = getGuestCart();
-    const item = localItems.find((i) => i.id === itemId);
-    if (item) {
-      item.quantity = Math.min(10, Math.max(1, quantity));
-      setGuestCart(localItems);
-    }
-    return { success: true };
+    return { success: false, message: "Please sign in to update cart items." };
   }
 
   return apiFetch<{ data: CartItem }>(`/api/cart/${itemId}/`, {
@@ -282,9 +271,7 @@ export async function apiUpdateCartItem(itemId: number, quantity: number) {
 export async function apiRemoveCartItem(itemId: number) {
   const token = getStoredToken();
   if (!token) {
-    const localItems = getGuestCart().filter((i) => i.id !== itemId);
-    setGuestCart(localItems);
-    return { success: true };
+    return { success: false, message: "Please sign in to remove cart items." };
   }
 
   return apiFetch(`/api/cart/${itemId}/`, {

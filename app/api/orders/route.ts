@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PRODUCTS, formatINR } from "@/data/content";
 import { sendOrderNotificationEmail, OrderEmailPayload } from "@/lib/email";
+import { getDjangoBaseUrl } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
     const djangoOrdersUrl = process.env.DJANGO_ORDERS_API_URL || (
       process.env.DJANGO_API_URL
         ? process.env.DJANGO_API_URL.replace(/\/enquiries\/?$/, '/orders/')
-        : undefined
+        : `${getDjangoBaseUrl()}/api/orders/`
     );
 
     if (djangoOrdersUrl) {

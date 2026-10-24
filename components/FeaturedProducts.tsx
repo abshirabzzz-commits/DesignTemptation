@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getFeaturedProducts, formatINR } from "@/data/content";
 import { ProductItem } from "@/types";
+import { ProductCardCartButton } from "./ProductCardCartButton";
 
 function FeaturedProductCard({ prod }: { prod: ProductItem }) {
   const [hasError, setHasError] = useState(false);
@@ -69,13 +70,16 @@ function FeaturedProductCard({ prod }: { prod: ProductItem }) {
           <span className="font-sans text-base font-semibold text-[#171615] tracking-wide tabular-nums">
             {displayPrice}
           </span>
-          <Link
-            href={`/products/${prod.slug}`}
-            className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs uppercase tracking-[0.16em] font-semibold sm:font-medium text-[#171615] group-hover:text-[#5A5752] transition-colors py-1.5 min-h-[42px] sm:min-h-0"
-          >
-            <span>View</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <ProductCardCartButton slug={prod.slug} name={prod.name} />
+            <Link
+              href={`/products/${prod.slug}`}
+              className="inline-flex items-center gap-1 text-[13px] sm:text-xs uppercase tracking-[0.16em] font-semibold sm:font-medium text-[#171615] group-hover:text-[#5A5752] transition-colors py-1.5 min-h-[42px] sm:min-h-0"
+            >
+              <span>View</span>
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
+          </div>
         </div>
       </div>
     </article>

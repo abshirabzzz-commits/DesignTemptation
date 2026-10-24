@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { PRODUCTS, BRAND } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ProductCardCartButton } from "@/components/ProductCardCartButton";
 
 export const metadata: Metadata = {
   title: "Curated Objects & Furnishings",
@@ -92,7 +93,7 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                <div className="pt-2.5 border-t border-[#ECE7DF]">
+                <div className="pt-2.5 border-t border-[#ECE7DF] flex items-center justify-between">
                   <Link
                     href={`/products/${product.slug}`}
                     className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.14em] font-medium text-[#171615] hover:text-[#5A5752] transition-colors py-1 min-h-[36px] sm:min-h-0"
@@ -100,6 +101,7 @@ export default function ProductsPage() {
                     <span>Acquire Piece</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
+                  <ProductCardCartButton slug={product.slug} name={product.name} compact />
                 </div>
               </div>
             ))}

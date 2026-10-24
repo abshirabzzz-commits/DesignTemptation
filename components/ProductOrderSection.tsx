@@ -12,7 +12,7 @@ interface ProductOrderSectionProps {
 }
 
 export function ProductOrderSection({ product }: ProductOrderSectionProps) {
-  const { user, isAuthenticated, openAuthModal, refreshCart, refreshWishlist } = useAuth();
+  const { user, isAuthenticated, openAuthModal, refreshCart, refreshWishlist, addToCart } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -218,11 +218,10 @@ export function ProductOrderSection({ product }: ProductOrderSectionProps) {
             <button
               type="button"
               onClick={async () => {
-                const res = await apiAddToCart(product.slug, 1);
-                if (res.success) {
-                  await refreshCart();
-                  setCartFeedback(`Added ${product.name} to your cart.`);
-                  setTimeout(() => setCartFeedback(null), 3000);
+                const res = await addToCart(product.slug, quantity, product.name);
+                if (res.success && res.message) {
+                  setCartFeedback(res.message);
+                  setTimeout(() => setCartFeedback(null), 4000);
                 }
               }}
               className="py-3 px-4 border border-[#171615] text-[#171615] text-xs font-semibold tracking-wider uppercase hover:bg-white flex items-center justify-center gap-2 transition-colors cursor-pointer"

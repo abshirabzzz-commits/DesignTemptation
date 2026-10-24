@@ -45,3 +45,54 @@ class CoreHealthCheckAndConfigTestCase(TestCase):
         if test_host not in allowed:
             allowed.append(test_host)
         self.assertIn(test_host, allowed)
+
+    def test_production_cors_allowed_origins_configured(self):
+        """Verify production domain and Vercel domains are allowed by CORS configuration."""
+        from django.conf import settings
+        expected_origins = [
+            'https://designtemptation.com',
+            'https://www.designtemptation.com',
+            'https://design-temptation.vercel.app',
+        ]
+        for origin in expected_origins:
+            self.assertIn(origin, settings.CORS_ALLOWED_ORIGINS)
+
+    def test_cors_preflight_options_for_production_origin(self):
+        """Verify OPTIONS preflight request from production domain receives Access-Control-Allow-Origin."""
+        response = self.client.options(
+            '/api/auth/register/',
+            HTTP_ORIGIN='https://designtemptation.com',
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD='POST',
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS='content-type',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get('Access-Control-Allow-Origin'), 'https://designtemptation.com')
+
+    def test_cors_preflight_options_for_vercel_preview(self):
+        """Verify OPTIONS preflight request from Design Temptation Vercel preview receives Access-Control-Allow-Origin."""
+        response = self.client.options(
+            '/api/auth/register/',
+            HTTP_ORIGIN='https://design-temptation-git-feature-preview.vercel.app',
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD='POST',
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS='content-type',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.get('Access-Control-Allow-Origin'),
+            'https://design-temptation-git-feature-preview.vercel.app'
+        )
+
+    def test_cors_preflight_rejects_unrelated_vercel_origin(self):
+        """Verify OPTIONS preflight request from unrelated third-party Vercel app does not receive Access-Control-Allow-Origin."""
+        response = self.client.options(
+            '/api/auth/register/',
+            HTTP_ORIGIN='https://unrelated-thirdparty-site.vercel.app',
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD='POST',
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS='content-type',
+        )
+        self.assertIsNone(response.get('Access-Control-Allow-Origin'))
+
+    def test_csrf_trusted_origins_does_not_contain_broad_vercel_wildcard(self):
+        """Verify that overly broad https://*.vercel.app is not added to CSRF_TRUSTED_ORIGINS."""
+        from django.conf import settings
+        self.assertNotIn('https://*.vercel.app', settings.CSRF_TRUSTED_ORIGINS)

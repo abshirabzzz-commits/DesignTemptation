@@ -109,15 +109,41 @@ export function AuthModal() {
       const res = await login(email, password);
       setIsSubmitting(false);
       if (!res.success) {
-        setErrorMessage(res.message || "Invalid email or password.");
-        if (res.errors) setFieldErrors(res.errors);
+        let msg = res.message || "Invalid email or password.";
+        if (res.errors) {
+          if (res.errors.non_field_errors?.[0]) {
+            msg = res.errors.non_field_errors[0];
+          } else if (res.errors.detail) {
+            msg = res.errors.detail;
+          } else if (res.errors.email?.[0]) {
+            msg = res.errors.email[0];
+          } else if (res.errors.password?.[0]) {
+            msg = res.errors.password[0];
+          }
+          setFieldErrors(res.errors);
+        }
+        setErrorMessage(msg);
       }
     } else if (tab === "signup") {
       const res = await register(name, email, password, phone);
       setIsSubmitting(false);
       if (!res.success) {
-        setErrorMessage(res.message || "Unable to create account. Please check the fields.");
-        if (res.errors) setFieldErrors(res.errors);
+        let msg = res.message || "Unable to create account. Please check the fields.";
+        if (res.errors) {
+          if (res.errors.email?.[0]) {
+            msg = res.errors.email[0];
+          } else if (res.errors.password?.[0]) {
+            msg = res.errors.password[0];
+          } else if (res.errors.name?.[0]) {
+            msg = res.errors.name[0];
+          } else if (res.errors.non_field_errors?.[0]) {
+            msg = res.errors.non_field_errors[0];
+          } else if (res.errors.detail) {
+            msg = res.errors.detail;
+          }
+          setFieldErrors(res.errors);
+        }
+        setErrorMessage(msg);
       }
     } else if (tab === "forgot") {
       if (!resetSent) {

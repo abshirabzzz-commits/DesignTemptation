@@ -530,3 +530,108 @@ class MyOrdersAPITestCase(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["count"], 1)
         self.assertEqual(res.data["data"][0]["order_number"], "DT-ORD-OTHER02")
+
+
+class CartAndWishlistAPITests(TestCase):
+    def setUp(self):
+        self.anonymous_client = APIClient()
+
+        self.user_a = User.objects.create_user(
+            username="user_a@example.com",
+            email="user_a@example.com",
+            password="PasswordA123!"
+        )
+        self.client_a = APIClient()
+        self.client_a.force_authenticate(user=self.user_a)
+
+        self.user_b = User.objects.create_user(
+            username="user_b@example.com",
+            email="user_b@example.com",
+            password="PasswordB123!"
+        )
+        self.client_b = APIClient()
+        self.client_b.force_authenticate(user=self.user_b)
+
+        self.product = Product.objects.create(
+            name="Travertine Console",
+            slug="travertine-console",
+            category="Living Objects",
+            price="₹4,50,000",
+            numeric_price=450000,
+            image="/images/products/console.jpg",
+            available=True
+        )
+
+    def test_anonymous_cannot_add_to_cart(self):
+        res = self.anonymous_client.post(
+            "/api/cart/",
+            {"product_slug": self.product.slug, "quantity": 1},
+            format="json"
+        )
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_anonymous_cannot_view_cart(self):
+        res = self.anonymous_client.get("/api/cart/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_authenticated_customer_can_add_to_cart(self):
+        res = self.client_a.post(
+            "/api/cart/",
+            {"product_slug": self.product.slug, "quantity": 2},
+            format="json"
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(res.data["success"])
+
+        # Check list endpoint
+        list_res = self.client_a.get("/api/cart/")
+        self.assertEqual(list_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(list_res.data["count"], 1)
+        self.assertEqual(list_res.data["total_items"], 2)
+
+    def test_adding_existing_cart_product_increments_quantity_without_duplicate(self):
+        # Add 1
+        self.client_a.post(
+            "/api/cart/",
+            {"product_slug": self.product.slug, "quantity": 1},
+            format="json"
+        )
+        # Add 2 more
+        self.client_a.post(
+            "/api/cart/",
+            {"product_slug": self.product.slug, "quantity": 2},
+            format="json"
+        )
+        list_res = self.client_a.get("/api/cart/")
+        self.assertEqual(list_res.data["count"], 1)
+        self.assertEqual(list_res.data["total_items"], 3)
+
+    def test_customer_isolation_cart(self):
+        # User A adds item
+        self.client_a.post(
+            "/api/cart/",
+            {"product_slug": self.product.slug, "quantity": 1},
+            format="json"
+        )
+
+        # User B's cart must be empty
+        res_b = self.client_b.get("/api/cart/")
+        self.assertEqual(res_b.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_b.data["count"], 0)
+        self.assertEqual(res_b.data["total_items"], 0)
+
+    def test_customer_isolation_wishlist(self):
+        # User A toggles wishlist
+        self.client_a.post(
+            "/api/wishlist/toggle/",
+            {"product_slug": self.product.slug},
+            format="json"
+        )
+
+        # User A has 1 item
+        res_a = self.client_a.get("/api/wishlist/")
+        self.assertEqual(len(res_a.data), 1)
+
+        # User B has 0 items
+        res_b = self.client_b.get("/api/wishlist/")
+        self.assertEqual(len(res_b.data), 0)
