@@ -24,7 +24,7 @@ class IsAdminUserOrReadOnly(permissions.BasePermission):
 class ProductViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Products catalog.
-    Allows public listing and retrieval by slug.
+    Allows public listing and retrieval by slug or ID.
     Restricts creation, updates, and deletion to authenticated staff/admin users.
     """
     queryset = Product.objects.all()
@@ -32,10 +32,25 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUserOrReadOnly]
     lookup_field = 'slug'
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_val = self.kwargs[lookup_url_kwarg]
+
+        obj = queryset.filter(slug=lookup_val).first()
+        if not obj and str(lookup_val).isdigit():
+            obj = queryset.filter(pk=int(lookup_val)).first()
+        if not obj:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Product not found with the specified slug or ID.")
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         category = self.request.query_params.get('category', None)
         featured = self.request.query_params.get('featured', None)
+        search = self.request.query_params.get('search', None)
 
         if category and category != 'All':
             queryset = queryset.filter(category__iexact=category)
@@ -43,6 +58,14 @@ class ProductViewSet(viewsets.ModelViewSet):
         if featured is not None:
             is_featured = featured.lower() in ['true', '1', 'yes']
             queryset = queryset.filter(featured=is_featured)
+
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(material__icontains=search) |
+                Q(description__icontains=search) |
+                Q(category__icontains=search)
+            )
 
         return queryset
 
@@ -63,6 +86,29 @@ class OrderViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'my_orders']:
             return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status_param = self.request.query_params.get('status')
+        search_param = self.request.query_params.get('search')
+        date_param = self.request.query_params.get('date')
+
+        if status_param and status_param != 'All':
+            queryset = queryset.filter(status__iexact=status_param)
+
+        if search_param:
+            queryset = queryset.filter(
+                Q(order_number__icontains=search_param) |
+                Q(customer_name__icontains=search_param) |
+                Q(customer_email__icontains=search_param) |
+                Q(customer_phone__icontains=search_param) |
+                Q(city__icontains=search_param)
+            )
+
+        if date_param:
+            queryset = queryset.filter(created_at__date=date_param)
+
+        return queryset
 
     def create(self, request, *args, **kwargs):
         if not request.user or not request.user.is_authenticated:
@@ -98,7 +144,6 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='my-orders', permission_classes=[permissions.IsAuthenticated])
     def my_orders(self, request):
-
         user = request.user
         orders = Order.objects.filter(
             Q(user=user) | Q(customer_email__iexact=user.email)

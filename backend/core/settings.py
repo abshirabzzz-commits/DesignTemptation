@@ -62,17 +62,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    
+
     # Local apps
     'accounts.apps.AccountsConfig',
     'enquiries.apps.EnquiriesConfig',
     'projects.apps.ProjectsConfig',
     'products.apps.ProductsConfig',
+    'reviews.apps.ReviewsConfig',
+    'services.apps.ServicesConfig',
+    'site_settings.apps.SiteSettingsConfig',
 ]
 
 MIDDLEWARE = [

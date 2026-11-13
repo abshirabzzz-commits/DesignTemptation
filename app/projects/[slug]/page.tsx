@@ -8,10 +8,49 @@ import { PROJECTS, getProjectBySlug } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+import { getDjangoBaseUrl } from "@/lib/api";
+import { Project } from "@/types";
 import { SITE_URL } from "@/lib/site";
+
+export const dynamicParams = true;
+export const revalidate = 30;
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
+}
+
+async function fetchProject(slug: string): Promise<Project | null> {
+  try {
+    const baseUrl = getDjangoBaseUrl();
+    const res = await fetch(`${baseUrl}/api/projects/${slug}/`, { next: { revalidate: 30 } });
+    if (res.ok) {
+      const p = await res.json();
+      return {
+        id: String(p.id),
+        slug: p.slug,
+        title: p.title,
+        location: p.location,
+        category: p.category,
+        propertyType: p.property_type,
+        year: p.year,
+        area: p.area,
+        shortDescription: p.short_description,
+        description: p.description,
+        designApproach: p.design_approach,
+        coverImage: p.cover_image,
+        galleryImages: p.gallery || [],
+        scope: ["Spatial Master Planning", "Interior Architecture", "Custom Millwork & Joinery Details"],
+        featured: p.featured,
+        image: p.cover_image,
+        imageAlt: p.title,
+        aspectRatio: "horizontal" as const,
+        createdAt: p.created_at,
+      };
+    }
+  } catch {
+    // fallback
+  }
+  return getProjectBySlug(slug) || null;
 }
 
 export async function generateStaticParams() {
@@ -24,7 +63,7 @@ export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await fetchProject(slug);
 
   if (!project) {
     return {
@@ -69,7 +108,7 @@ export async function generateMetadata({
 
 export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await fetchProject(slug);
 
   if (!project) {
     notFound();
@@ -161,6 +200,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           </div>
 
           {/* 9. Relevant Project Information Metadata Bar */}
+          {/* Relevant Project Information Metadata Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-y border-[#ECE7DF] bg-[#FAF8F5]">
             <div className="space-y-1">
               <p className="text-[11px] sm:text-[11px] font-sans tracking-[0.22em] uppercase text-[#8C877E] font-medium">
@@ -200,6 +240,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           </div>
 
           {/* 6. Description & 8. Design Approach / Concept */}
+          {/* Description & Design Approach / Concept */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 pt-4">
             {/* Left Column: Design Approach & Scope */}
             <div className="lg:col-span-5 space-y-8">
@@ -252,6 +293,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           </div>
 
           {/* 7. Image Gallery */}
+          {/* Image Gallery */}
           {gallery.length > 1 && (
             <div className="space-y-4 pt-8 border-t border-[#ECE7DF]">
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 border-b border-[#ECE7DF] pb-2.5">
@@ -269,6 +311,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               </div>
 
               {/* Gallery Grid (Compact, restrained editorial presentation) */}
+              {/* Gallery Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
                 {gallery.map((imgUrl, i) => (
                   <div
@@ -292,6 +335,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           )}
 
           {/* 10. Suggested CTA */}
+          {/* Suggested CTA */}
           <section className="bg-[#171615] text-[#FAF8F5] p-8 sm:p-12 lg:p-14 border border-[#ECE7DF] flex flex-col md:flex-row md:items-center justify-between gap-8 mt-16">
             <div className="space-y-2 max-w-xl">
               <p className="text-[10px] font-sans tracking-[0.25em] uppercase text-[#DFD9CF]">

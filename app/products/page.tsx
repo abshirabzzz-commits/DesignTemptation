@@ -7,6 +7,10 @@ import { PRODUCTS, BRAND } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCardCartButton } from "@/components/ProductCardCartButton";
+import { getDjangoBaseUrl } from "@/lib/api";
+import { ProductItem } from "@/types";
+
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Curated Objects & Furnishings",
@@ -38,7 +42,40 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ProductsPage() {
+async function getLiveProducts(): Promise<ProductItem[]> {
+  try {
+    const baseUrl = getDjangoBaseUrl();
+    const res = await fetch(`${baseUrl}/api/products/`, { next: { revalidate: 30 } });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((p: any) => ({
+          id: String(p.id),
+          slug: p.slug,
+          name: p.name,
+          category: p.category,
+          price: p.price,
+          numericPrice: p.numeric_price,
+          image: p.image,
+          imageAlt: p.image_alt || p.name,
+          dimensions: p.dimensions || "",
+          material: p.material || "",
+          description: p.description || "",
+          featured: p.featured,
+          available: p.available,
+          createdAt: p.created_at,
+        }));
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return PRODUCTS;
+}
+
+export default async function ProductsPage() {
+  const products = await getLiveProducts();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
       <Header />
@@ -67,7 +104,7 @@ export default function ProductsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
-            {PRODUCTS.map((product) => (
+            {products.map((product) => (
               <div key={product.id} className="bg-white border border-[#ECE7DF] p-3.5 sm:p-5 space-y-3.5 hover:border-[#171615]/35 hover:shadow-[0_8px_24px_rgba(23,22,21,0.06)] active:scale-[0.995] transition-all duration-300 flex flex-col justify-between">
                 <div>
                   <Link href={`/products/${product.slug}`} className="block relative aspect-square w-full bg-[#ECE7DF] overflow-hidden group">

@@ -167,3 +167,45 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class CustomerAdminSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    phone = serializers.CharField(source='customer_profile.phone', read_only=True)
+    delivery_address = serializers.CharField(source='customer_profile.delivery_address', read_only=True)
+    city = serializers.CharField(source='customer_profile.city', read_only=True)
+    state = serializers.CharField(source='customer_profile.state', read_only=True)
+    postal_code = serializers.CharField(source='customer_profile.postal_code', read_only=True)
+    order_count = serializers.SerializerMethodField()
+    total_spent = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'full_name',
+            'phone',
+            'delivery_address',
+            'city',
+            'state',
+            'postal_code',
+            'is_staff',
+            'date_joined',
+            'order_count',
+            'total_spent',
+        ]
+
+    def get_full_name(self, obj):
+        name = f"{obj.first_name} {obj.last_name}".strip()
+        return name if name else obj.email.split('@')[0]
+
+    def get_order_count(self, obj):
+        return obj.orders.count() if hasattr(obj, 'orders') else 0
+
+    def get_total_spent(self, obj):
+        if not hasattr(obj, 'orders'):
+            return 0
+        return sum(obj.orders.values_list('total_amount', flat=True))

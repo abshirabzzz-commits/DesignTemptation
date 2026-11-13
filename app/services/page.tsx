@@ -6,6 +6,10 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SERVICES } from "@/data/content";
+import { getDjangoBaseUrl } from "@/lib/api";
+import { ServiceItem } from "@/types";
+
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Services",
@@ -37,7 +41,34 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ServicesPage() {
+async function getLiveServices(): Promise<ServiceItem[]> {
+  try {
+    const baseUrl = getDjangoBaseUrl();
+    const res = await fetch(`${baseUrl}/api/services/?active=true`, { next: { revalidate: 30 } });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((s: any) => ({
+          id: String(s.id),
+          slug: s.slug,
+          title: s.title,
+          subtitle: s.subtitle || "",
+          description: s.description,
+          image: s.image,
+          imageAlt: s.title,
+          disciplines: s.disciplines || [],
+        }));
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return SERVICES;
+}
+
+export default async function ServicesPage() {
+  const services = await getLiveServices();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
       <Header />
@@ -72,7 +103,7 @@ export default function ServicesPage() {
 
           {/* Service Disciplines In-Depth */}
           <div className="space-y-20">
-            {SERVICES.map((service, idx) => (
+            {services.map((service, idx) => (
               <div
                 key={service.id}
                 id={service.slug}

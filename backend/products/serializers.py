@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.text import slugify
 from .models import Product, Order, CartItem, WishlistItem
 import re
 import uuid
@@ -22,6 +23,30 @@ class ProductSerializer(serializers.ModelSerializer):
             'available',
             'created_at',
         ]
+        extra_kwargs = {
+            'slug': {'required': False},
+            'numeric_price': {'required': False},
+            'price': {'required': False},
+        }
+
+    def validate(self, attrs):
+        if not attrs.get('slug') and attrs.get('name'):
+            base_slug = slugify(attrs['name'])
+            slug = base_slug
+            counter = 1
+            while Product.objects.filter(slug=slug).exclude(pk=self.instance.pk if self.instance else None).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            attrs['slug'] = slug
+
+        if 'numeric_price' in attrs and attrs['numeric_price'] and not attrs.get('price'):
+            attrs['price'] = f"₹{attrs['numeric_price']:,}"
+        elif 'price' in attrs and attrs['price'] and not attrs.get('numeric_price'):
+            digits = re.sub(r'\D', '', str(attrs['price']))
+            if digits:
+                attrs['numeric_price'] = int(digits)
+
+        return attrs
 
 
 class OrderSerializer(serializers.ModelSerializer):

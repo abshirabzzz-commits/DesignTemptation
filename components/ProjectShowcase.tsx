@@ -1,13 +1,63 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getFeaturedProjects } from "@/data/content";
 import { ProjectCard } from "@/components/ProjectCard";
+import { getDjangoBaseUrl } from "@/lib/api";
+import { Project } from "@/types";
 
 export function ProjectShowcase() {
-  const featuredProjects = getFeaturedProjects();
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>(() => getFeaturedProjects());
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadFeatured() {
+      try {
+        const baseUrl = getDjangoBaseUrl();
+        const res = await fetch(`${baseUrl}/api/projects/?featured=true`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0 && isMounted) {
+            setFeaturedProjects(
+              data.map((p: any) => ({
+                id: String(p.id),
+                slug: p.slug,
+                title: p.title,
+                location: p.location,
+                category: p.category,
+                propertyType: p.property_type,
+                year: p.year,
+                area: p.area,
+                shortDescription: p.short_description,
+                description: p.description,
+                designApproach: p.design_approach,
+                coverImage: p.cover_image,
+                galleryImages: p.gallery || [],
+                scope: [
+                  "Spatial Master Planning",
+                  "Interior Architecture",
+                  "Custom Millwork & Joinery Details",
+                ],
+                featured: p.featured,
+                image: p.cover_image,
+                imageAlt: p.title,
+                aspectRatio: "horizontal" as const,
+                createdAt: p.created_at,
+              }))
+            );
+          }
+        }
+      } catch {
+        // keep static fallback
+      }
+    }
+    loadFeatured();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <section id="projects" className="py-12 sm:py-18 lg:py-22 bg-[#FAF8F5]">
@@ -32,7 +82,7 @@ export function ProjectShowcase() {
           </Link>
         </div>
 
-        {/* Balanced Editorial 3-Project Grid (Medium-sized, photography-focused) */}
+        {/* Balanced Editorial 3-Project Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
           {featuredProjects.map((project, idx) => (
             <ProjectCard

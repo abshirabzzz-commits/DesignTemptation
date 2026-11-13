@@ -164,3 +164,112 @@ export interface OrderRecord {
   created_at: string;
   updated_at: string;
 }
+
+
+export interface AdminOverviewStats {
+  total_projects: number;
+  total_products: number;
+  total_orders: number;
+  pending_orders: number;
+  total_enquiries: number;
+  pending_enquiries: number;
+  total_customers: number;
+  gross_revenue: number;
+}
+
+export interface RecentActivityItem {
+  id: string;
+  type: 'order' | 'enquiry' | 'system';
+  title: string;
+  description: string;
+  timestamp: string;
+  status?: string;
+}
+
+export interface AdminOverviewData {
+  stats: AdminOverviewStats;
+  recent_orders: OrderRecord[];
+  recent_enquiries: any[];
+  recent_activities: RecentActivityItem[];
+}
+
+export interface CustomerRecord {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  phone: string;
+  delivery_address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  is_staff: boolean;
+  date_joined: string;
+  order_count: number;
+  total_spent: number;
+}
+
+export interface SiteSettingsData {
+  id?: number;
+  studio_name: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  address_line1: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  hero_heading: string;
+  hero_subheading: string;
+  instagram_url: string;
+  maps_url: string;
+  updated_at?: string;
+}
+
+export interface AdminReviewRecord {
+  id: number;
+  quote: string;
+  rating: number;
+  client_name: string;
+  project_type: string;
+  location: string;
+  year: string;
+  is_approved: boolean;
+  is_featured: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface AdminServiceRecord {
+  id: number;
+  title: string;
+  slug: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  image_alt: string;
+  disciplines: string[];
+  order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface AdminProjectRecord {
+  id: number;
+  slug: string;
+  title: string;
+  location: string;
+  category: string;
+  property_type: string;
+  year: string;
+  area: string;
+  short_description: string;
+  description: string;
+  design_approach: string;
+  cover_image: string;
+  featured: boolean;
+  created_at: string;
+  gallery: string[];
+}

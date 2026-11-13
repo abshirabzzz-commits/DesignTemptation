@@ -93,9 +93,17 @@ class GoogleAuthView(APIView):
         credential = serializer.validated_data['credential']
         google_client_id = getattr(settings, 'GOOGLE_CLIENT_ID', None)
 
+        # Basic JWT format check
+        if not credential or len(credential.split('.')) != 3:
+            return Response(
+                {"success": False, "message": "Invalid Google token format."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
             from google.oauth2 import id_token
             from google.auth.transport import requests as google_requests
+            from google.auth.exceptions import GoogleAuthError
 
             request_adapter = google_requests.Request()
             # If client_id is configured, verify audience strictly; otherwise verify signature
@@ -168,7 +176,7 @@ class GoogleAuthView(APIView):
                 status=status.HTTP_200_OK
             )
 
-        except ValueError as e:
+        except (ValueError, GoogleAuthError) as e:
             return Response(
                 {
                     "success": False,
@@ -306,3 +314,120 @@ class PasswordResetConfirmView(APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+from django.db.models import Q
+from .serializers import CustomerAdminSerializer
+
+class AdminCustomerListView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        search_query = request.query_params.get('search', '').strip()
+        users = User.objects.all().select_related('customer_profile').prefetch_related('orders').order_by('-date_joined')
+
+        if search_query:
+            users = users.filter(
+                Q(email__icontains=search_query) |
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query) |
+                Q(customer_profile__phone__icontains=search_query) |
+                Q(customer_profile__city__icontains=search_query)
+            )
+
+        serializer = CustomerAdminSerializer(users, many=True)
+        return Response({
+            "success": True,
+            "count": users.count(),
+            "data": serializer.data
+        })
+
+
+class AdminCustomerDetailView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request, pk):
+        user = User.objects.filter(pk=pk).select_related('customer_profile').prefetch_related('orders').first()
+        if not user:
+            return Response({"success": False, "message": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CustomerAdminSerializer(user)
+        from products.serializers import OrderSerializer
+        orders_serializer = OrderSerializer(user.orders.all().order_by('-created_at'), many=True)
+
+        return Response({
+            "success": True,
+            "data": serializer.data,
+            "orders": orders_serializer.data
+        })
+
+
+class AdminDashboardOverviewView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        from projects.models import Project
+        from products.models import Product, Order
+        from enquiries.models import ProjectEnquiry
+        from products.serializers import OrderSerializer
+        from enquiries.serializers import ProjectEnquirySerializer
+
+        total_projects = Project.objects.count()
+        total_products = Product.objects.count()
+        total_orders = Order.objects.count()
+        pending_orders = Order.objects.filter(status='Pending').count()
+        total_enquiries = ProjectEnquiry.objects.count()
+        pending_enquiries = ProjectEnquiry.objects.filter(status='New').count()
+        total_customers = User.objects.filter(is_staff=False).count() or User.objects.count()
+
+        # Revenue in INR
+        gross_revenue = sum(Order.objects.values_list('total_amount', flat=True))
+
+        # Recent 5 Orders
+        recent_orders_qs = Order.objects.select_related('product', 'user').order_by('-created_at')[:5]
+        recent_orders_data = OrderSerializer(recent_orders_qs, many=True).data
+
+        # Recent 5 Enquiries
+        recent_enquiries_qs = ProjectEnquiry.objects.order_by('-created_at')[:5]
+        recent_enquiries_data = ProjectEnquirySerializer(recent_enquiries_qs, many=True).data
+
+        # Recent activity timeline
+        activities = []
+        for o in recent_orders_qs:
+            activities.append({
+                "id": f"order-{o.id}",
+                "type": "order",
+                "title": f"Order #{o.order_number}",
+                "description": f"{o.customer_name} placed an acquisition order for {o.product.name} (₹{o.total_amount:,})",
+                "timestamp": o.created_at.isoformat(),
+                "status": o.status,
+            })
+        for e in recent_enquiries_qs:
+            activities.append({
+                "id": f"enquiry-{e.id}",
+                "type": "enquiry",
+                "title": f"Enquiry from {e.full_name}",
+                "description": f"Interest in {e.project_type} ({e.property_type}) in {e.project_location}",
+                "timestamp": e.created_at.isoformat(),
+                "status": e.status,
+            })
+
+        # Sort activities descending by timestamp
+        activities.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        return Response({
+            "success": True,
+            "stats": {
+                "total_projects": total_projects,
+                "total_products": total_products,
+                "total_orders": total_orders,
+                "pending_orders": pending_orders,
+                "total_enquiries": total_enquiries,
+                "pending_enquiries": pending_enquiries,
+                "total_customers": total_customers,
+                "gross_revenue": gross_revenue,
+            },
+            "recent_orders": recent_orders_data,
+            "recent_enquiries": recent_enquiries_data,
+            "recent_activities": activities[:8],
+        })

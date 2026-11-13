@@ -54,6 +54,32 @@ export function setStoredToken(token: string | null) {
   }
 }
 
+/**
+ * Synchronizes client token with Next.js server-side HttpOnly session cookies.
+ * This enables Next.js 16 Proxy to enforce route protection securely without
+ * relying on unverified client headers or client-side JavaScript cookies.
+ */
+export async function apiSyncSession(token: string | null): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    if (token) {
+      const res = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+      return res.ok;
+    } else {
+      const res = await fetch("/api/auth/session", {
+        method: "DELETE",
+      });
+      return res.ok;
+    }
+  } catch {
+    return false;
+  }
+}
+
 export async function apiFetch<T = any>(
   endpoint: string,
   options: RequestInit = {}
@@ -81,6 +107,11 @@ export async function apiFetch<T = any>(
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
+      if (res.status === 401 && !endpoint.includes("/login")) {
+        // Token was revoked or expired on backend: clear local and server session
+        setStoredToken(null);
+        apiSyncSession(null);
+      }
       return {
         success: false,
         message: data.message || data.detail || `Request failed with status ${res.status}`,
@@ -89,8 +120,16 @@ export async function apiFetch<T = any>(
       };
     }
 
+    if (Array.isArray(data)) {
+      return {
+        success: true,
+        data: data as unknown as T,
+      };
+    }
+
     return {
       success: true,
+      data: (data && data.data !== undefined ? data.data : data) as unknown as T,
       ...data,
     };
   } catch (error: any) {
@@ -342,4 +381,232 @@ export async function apiUpdateEnquiryStatus(enquiryId: number, newStatus: strin
     method: "PATCH",
     body: JSON.stringify({ status: newStatus }),
   });
+}
+
+
+// ---------------------------------------------------------------------------
+// Overview & Customer Management APIs
+// ---------------------------------------------------------------------------
+export async function apiGetAdminOverview() {
+  return apiFetch<{
+    success: boolean;
+    stats: {
+      total_projects: number;
+      total_products: number;
+      total_orders: number;
+      pending_orders: number;
+      total_enquiries: number;
+      pending_enquiries: number;
+      total_customers: number;
+      gross_revenue: number;
+    };
+    recent_orders: OrderRecord[];
+    recent_enquiries: any[];
+    recent_activities: any[];
+  }>(`/api/admin/overview/`);
+}
+
+export async function apiGetAdminCustomers(search?: string) {
+  const query = new URLSearchParams();
+  if (search && search.trim()) query.set("search", search.trim());
+  const qStr = query.toString();
+  return apiFetch<{ success: boolean; count: number; data: any[] }>(`/api/admin/customers/${qStr ? `?${qStr}` : ""}`);
+}
+
+export async function apiGetAdminCustomerDetail(customerId: number) {
+  return apiFetch<{ success: boolean; data: any; orders: OrderRecord[] }>(`/api/admin/customers/${customerId}/`);
+}
+
+export async function apiDeleteOrder(orderId: number) {
+  return apiFetch(`/api/orders/${orderId}/`, {
+    method: "DELETE",
+  });
+}
+
+export async function apiDeleteEnquiry(enquiryId: number) {
+  return apiFetch(`/api/enquiries/${enquiryId}/`, {
+    method: "DELETE",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Project Management APIs
+// ---------------------------------------------------------------------------
+export async function apiGetAdminProjects(params: { category?: string; search?: string } = {}) {
+  const query = new URLSearchParams();
+  if (params.category && params.category !== "All") query.set("category", params.category);
+  if (params.search && params.search.trim()) query.set("search", params.search.trim());
+  const qStr = query.toString();
+  return apiFetch<any[]>(`/api/projects/${qStr ? `?${qStr}` : ""}`);
+}
+
+export async function apiCreateProject(payload: any) {
+  return apiFetch<any>(`/api/projects/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiUpdateProject(idOrSlug: string | number, payload: any) {
+  return apiFetch<any>(`/api/projects/${idOrSlug}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiDeleteProject(idOrSlug: string | number) {
+  return apiFetch(`/api/projects/${idOrSlug}/`, {
+    method: "DELETE",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Product Management APIs
+// ---------------------------------------------------------------------------
+export async function apiGetAdminProducts(params: { category?: string; search?: string } = {}) {
+  const query = new URLSearchParams();
+  if (params.category && params.category !== "All") query.set("category", params.category);
+  if (params.search && params.search.trim()) query.set("search", params.search.trim());
+  const qStr = query.toString();
+  return apiFetch<any[]>(`/api/products/${qStr ? `?${qStr}` : ""}`);
+}
+
+export async function apiCreateProduct(payload: any) {
+  return apiFetch<any>(`/api/products/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiUpdateProduct(idOrSlug: string | number, payload: any) {
+  return apiFetch<any>(`/api/products/${idOrSlug}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiDeleteProduct(idOrSlug: string | number) {
+  return apiFetch(`/api/products/${idOrSlug}/`, {
+    method: "DELETE",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Reviews Moderation & Management APIs
+// ---------------------------------------------------------------------------
+export async function apiGetAdminReviews(params: { status?: string } = {}) {
+  const query = new URLSearchParams();
+  if (params.status && params.status !== "All") query.set("status", params.status.toLowerCase());
+  const qStr = query.toString();
+  return apiFetch<any[]>(`/api/reviews/${qStr ? `?${qStr}` : ""}`);
+}
+
+export async function apiCreateReview(payload: any) {
+  return apiFetch<any>(`/api/reviews/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiUpdateReview(reviewId: number, payload: any) {
+  return apiFetch<any>(`/api/reviews/${reviewId}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiToggleReviewApproval(reviewId: number) {
+  return apiFetch<{ success: boolean; is_approved: boolean; message: string }>(`/api/reviews/${reviewId}/toggle_approval/`, {
+    method: "POST",
+  });
+}
+
+export async function apiToggleReviewFeatured(reviewId: number) {
+  return apiFetch<{ success: boolean; is_featured: boolean; message: string }>(`/api/reviews/${reviewId}/toggle_featured/`, {
+    method: "POST",
+  });
+}
+
+export async function apiDeleteReview(reviewId: number) {
+  return apiFetch(`/api/reviews/${reviewId}/`, {
+    method: "DELETE",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Services Management APIs
+// ---------------------------------------------------------------------------
+export async function apiGetAdminServices() {
+  return apiFetch<any[]>(`/api/services/`);
+}
+
+export async function apiCreateService(payload: any) {
+  return apiFetch<any>(`/api/services/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiUpdateService(idOrSlug: string | number, payload: any) {
+  return apiFetch<any>(`/api/services/${idOrSlug}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiDeleteService(idOrSlug: string | number) {
+  return apiFetch(`/api/services/${idOrSlug}/`, {
+    method: "DELETE",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Website Settings & Image Upload APIs
+// ---------------------------------------------------------------------------
+export async function apiGetSiteSettings() {
+  return apiFetch<{ success: boolean; data: any }>(`/api/settings/`);
+}
+
+export async function apiUpdateSiteSettings(payload: any) {
+  return apiFetch<{ success: boolean; data: any; message: string }>(`/api/settings/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiUploadImage(file: File): Promise<{ success: boolean; url?: string; message?: string }> {
+  const token = getStoredToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const baseUrl = getDjangoBaseUrl();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Token ${token}`;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/api/upload/`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      return {
+        success: false,
+        message: data.message || "Failed to upload image.",
+      };
+    }
+    return {
+      success: true,
+      url: data.url,
+      message: "Image uploaded successfully.",
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.message || "Network error uploading image.",
+    };
+  }
 }

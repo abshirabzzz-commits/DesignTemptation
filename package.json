@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
+    "test": "node --test tests/admin-route-protection.test.mjs tests/api-url.test.mjs",
     "lint": "eslint"
   },
   "dependencies": {

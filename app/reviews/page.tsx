@@ -5,6 +5,10 @@ import { ArrowLeft, Star, ArrowRight } from "lucide-react";
 import { REVIEWS } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { getDjangoBaseUrl } from "@/lib/api";
+import { Review } from "@/types";
+
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Client Testimonials & Reviews",
@@ -36,7 +40,34 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ReviewsPage() {
+async function getLiveReviews(): Promise<Review[]> {
+  try {
+    const baseUrl = getDjangoBaseUrl();
+    const res = await fetch(`${baseUrl}/api/reviews/?approved=true`, { next: { revalidate: 30 } });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((r: any) => ({
+          id: String(r.id),
+          quote: r.quote,
+          rating: r.rating || 5,
+          clientName: r.client_name,
+          projectType: r.project_type,
+          location: r.location || "",
+          year: r.year || "",
+          avatar: r.avatar,
+        }));
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return REVIEWS;
+}
+
+export default async function ReviewsPage() {
+  const reviews = await getLiveReviews();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
       <Header />
@@ -75,7 +106,7 @@ export default function ReviewsPage() {
 
           {/* Reviews List */}
           <div className="space-y-4 sm:space-y-6">
-            {REVIEWS.map((review) => (
+            {reviews.map((review) => (
               <article
                 key={review.id}
                 className="p-5 sm:p-7 bg-white border border-[#ECE7DF] space-y-3.5 hover:border-[#171615]/35 hover:shadow-[0_6px_20px_rgba(23,22,21,0.04)] transition-all duration-300"
@@ -91,7 +122,7 @@ export default function ReviewsPage() {
                     ))}
                   </div>
                   <span className="text-[10px] text-[#8C877E] font-mono tracking-wider uppercase bg-[#FAF8F5] px-2 py-0.5 border border-[#ECE7DF]">
-                    Sample Preview
+                    Client Verified
                   </span>
                 </div>
 
@@ -105,6 +136,7 @@ export default function ReviewsPage() {
                   </span>
                   <span className="text-[#8C877E] font-light text-[11px] sm:text-xs">
                     {review.projectType}
+                    {review.location ? ` · ${review.location}` : ""}
                   </span>
                 </div>
               </article>

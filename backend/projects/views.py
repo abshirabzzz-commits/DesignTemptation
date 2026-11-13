@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from django.db.models import Q
 from .models import Project
 from .serializers import ProjectSerializer
 
@@ -24,10 +25,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUserOrReadOnly]
     lookup_field = 'slug'
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_val = self.kwargs[lookup_url_kwarg]
+
+        obj = queryset.filter(slug=lookup_val).first()
+        if not obj and str(lookup_val).isdigit():
+            obj = queryset.filter(pk=int(lookup_val)).first()
+        if not obj:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Project not found with the specified slug or ID.")
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         category = self.request.query_params.get('category', None)
         featured = self.request.query_params.get('featured', None)
+        search = self.request.query_params.get('search', None)
 
         if category and category != 'All':
             queryset = queryset.filter(category__iexact=category)
@@ -35,5 +51,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if featured is not None:
             is_featured = featured.lower() in ['true', '1', 'yes']
             queryset = queryset.filter(featured=is_featured)
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(location__icontains=search) |
+                Q(short_description__icontains=search) |
+                Q(property_type__icontains=search)
+            )
 
         return queryset

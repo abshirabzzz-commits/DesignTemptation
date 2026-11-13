@@ -6,6 +6,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { PROJECTS } from "@/data/content";
 import { ProjectsGallery } from "@/components/ProjectsGallery";
+import { getDjangoBaseUrl } from "@/lib/api";
+import { Project } from "@/types";
+
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Our Projects",
@@ -37,7 +41,45 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ProjectsPage() {
+async function getLiveProjects(): Promise<Project[]> {
+  try {
+    const baseUrl = getDjangoBaseUrl();
+    const res = await fetch(`${baseUrl}/api/projects/`, { next: { revalidate: 30 } });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((p: any) => ({
+          id: String(p.id),
+          slug: p.slug,
+          title: p.title,
+          location: p.location,
+          category: p.category,
+          propertyType: p.property_type,
+          year: p.year,
+          area: p.area,
+          shortDescription: p.short_description,
+          description: p.description,
+          designApproach: p.design_approach,
+          coverImage: p.cover_image,
+          galleryImages: p.gallery || [],
+          scope: ["Spatial Master Planning", "Interior Architecture", "Custom Millwork & Joinery Details"],
+          featured: p.featured,
+          image: p.cover_image,
+          imageAlt: p.title,
+          aspectRatio: "horizontal" as const,
+          createdAt: p.created_at,
+        }));
+      }
+    }
+  } catch {
+    // Fallback to static catalog
+  }
+  return PROJECTS;
+}
+
+export default async function ProjectsPage() {
+  const liveProjects = await getLiveProjects();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#171615]">
       <Header />
@@ -55,7 +97,7 @@ export default function ProjectsPage() {
             </Link>
           </div>
 
-          {/* Elegant Page Header */}
+          {/* Page Header */}
           <div className="border-b border-[#ECE7DF] pb-8 space-y-3">
             <p className="text-[10px] sm:text-[11px] font-sans tracking-[0.28em] uppercase text-[#8C877E] font-medium">
               PORTFOLIO
@@ -69,7 +111,7 @@ export default function ProjectsPage() {
           </div>
 
           {/* Interactive Filterable Projects Grid */}
-          <ProjectsGallery initialProjects={PROJECTS} />
+          <ProjectsGallery initialProjects={liveProjects} />
 
           {/* Bottom Commissioning CTA */}
           <section className="bg-[#171615] text-[#FAF8F5] p-8 sm:p-12 lg:p-14 border border-[#ECE7DF] flex flex-col md:flex-row md:items-center justify-between gap-8 mt-16">

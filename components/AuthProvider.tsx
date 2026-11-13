@@ -16,6 +16,7 @@ import {
   apiGetWishlist,
   getStoredToken,
   setStoredToken,
+  apiSyncSession,
   syncGuestCartToServer,
 } from "@/lib/api";
 
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [pendingCartItem]);
 
-  // Initial authentication check
+  // Initial authentication check & session cookie synchronization
   useEffect(() => {
     async function loadUser() {
       const token = getStoredToken();
@@ -136,13 +137,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const res = await apiGetMe();
         if (res.success && res.user) {
           setUser(res.user);
+          // Sync HttpOnly session cookie on the server for Proxy protection
+          await apiSyncSession(token);
           await Promise.all([refreshCart(), refreshWishlist()]);
         } else {
           setStoredToken(null);
+          await apiSyncSession(null);
           setUser(null);
         }
       } catch {
         setStoredToken(null);
+        await apiSyncSession(null);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -151,6 +156,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     loadUser();
   }, [refreshCart, refreshWishlist]);
+
+  // Check URL query parameters for proxy auth redirects
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const authAction = params.get("auth");
+    const nextUrl = params.get("next");
+
+    if (authAction === "signin") {
+      const msg = nextUrl?.includes("admin")
+        ? "Please sign in with administrator credentials to access the studio dashboard."
+        : "Please sign in to proceed.";
+      openAuthModal("signin", msg);
+    } else if (authAction === "denied") {
+      setCartFeedback("Access Denied: Your account does not have administrator privileges.");
+      setTimeout(() => setCartFeedback(null), 8000);
+    }
+  }, [openAuthModal]);
 
   const addToCart = useCallback(async (productSlug: string, quantity: number = 1, productName?: string) => {
     if (isAddingRef.current) {
@@ -185,12 +208,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await apiLogin({ email, password });
     if (res.success && res.token && res.user) {
       setStoredToken(res.token);
+      await apiSyncSession(res.token);
       setUser(res.user);
       setIsAuthModalOpen(false);
       setAuthModalMessage(null);
       await syncGuestCartToServer();
       await executePendingCartAddition();
       await Promise.all([refreshCart(), refreshWishlist()]);
+
+      // If next destination is present in query params, redirect appropriately
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const nextUrl = params.get("next");
+        if (nextUrl) {
+          if (nextUrl.includes("admin") && !res.user.is_staff) {
+            // Non-admin trying to access admin: do not redirect to admin
+            setCartFeedback("Access Denied: Your account does not have administrator privileges.");
+          } else {
+            window.location.href = nextUrl;
+          }
+        }
+      }
+
       return { success: true };
     }
     return {
@@ -204,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await apiRegister({ name, email, password, phone });
     if (res.success && res.token && res.user) {
       setStoredToken(res.token);
+      await apiSyncSession(res.token);
       setUser(res.user);
       setIsAuthModalOpen(false);
       setAuthModalMessage(null);
@@ -223,12 +263,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await apiGoogleAuth(credential);
     if (res.success && res.token && res.user) {
       setStoredToken(res.token);
+      await apiSyncSession(res.token);
       setUser(res.user);
       setIsAuthModalOpen(false);
       setAuthModalMessage(null);
       await syncGuestCartToServer();
       await executePendingCartAddition();
       await Promise.all([refreshCart(), refreshWishlist()]);
+
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const nextUrl = params.get("next");
+        if (nextUrl) {
+          if (nextUrl.includes("admin") && !res.user.is_staff) {
+            setCartFeedback("Access Denied: Your account does not have administrator privileges.");
+          } else {
+            window.location.href = nextUrl;
+          }
+        }
+      }
+
       return { success: true };
     }
     return {
@@ -243,6 +297,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Ignore network errors on logout
     }
+    await apiSyncSession(null);
     setStoredToken(null);
     setUser(null);
     setCartCount(0);

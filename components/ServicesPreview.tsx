@@ -1,30 +1,69 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { getDjangoBaseUrl } from "@/lib/api";
+
+interface ServiceDisplay {
+  number: string;
+  title: string;
+  description: string;
+  href: string;
+}
+
+const DEFAULT_SERVICES: ServiceDisplay[] = [
+  {
+    number: "01",
+    title: "Interior Design",
+    description: "Bespoke spatial curation, custom millwork, and tactile materiality for private residences.",
+    href: "/services",
+  },
+  {
+    number: "02",
+    title: "Architecture",
+    description: "Harmonious structural volumes, light-wells, and seamless indoor-outdoor connections.",
+    href: "/services",
+  },
+  {
+    number: "03",
+    title: "Turnkey Execution",
+    description: "Artisanal procurement, master craftsmanship coordination, and complete project delivery.",
+    href: "/services",
+  },
+];
 
 export function ServicesPreview() {
-  const services = [
-    {
-      number: "01",
-      title: "Interior Design",
-      description: "Bespoke spatial curation, custom millwork, and tactile materiality for private residences.",
-      href: "/services",
-    },
-    {
-      number: "02",
-      title: "Architecture",
-      description: "Harmonious structural volumes, light-wells, and seamless indoor-outdoor connections.",
-      href: "/services",
-    },
-    {
-      number: "03",
-      title: "Turnkey Execution",
-      description: "Artisanal procurement, master craftsmanship coordination, and complete project delivery.",
-      href: "/services",
-    },
-  ];
+  const [services, setServices] = useState<ServiceDisplay[]>(DEFAULT_SERVICES);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadServices() {
+      try {
+        const baseUrl = getDjangoBaseUrl();
+        const res = await fetch(`${baseUrl}/api/services/?active=true`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0 && isMounted) {
+            setServices(
+              data.slice(0, 3).map((s: any, idx: number) => ({
+                number: String(idx + 1).padStart(2, "0"),
+                title: s.title,
+                description: s.description,
+                href: `/services#${s.slug}`,
+              }))
+            );
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    loadServices();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <section id="services" className="py-12 sm:py-16 bg-[#FAF8F5] border-b border-[#ECE7DF]">
@@ -72,9 +111,9 @@ export function ServicesPreview() {
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-[#ECE7DF] flex items-center justify-between text-[13px] sm:text-[11.5px] uppercase tracking-[0.16em] font-semibold sm:font-medium text-[#171615] group-hover:text-[#5A5752] transition-colors min-h-[38px] sm:min-h-0">
-                <span>Explore Scope</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+              <div className="pt-2 border-t border-[#ECE7DF] flex items-center justify-between text-xs tracking-wider uppercase font-medium text-[#171615] group-hover:text-[#5A5752] transition-colors">
+                <span>Explore Discipline</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </div>
             </Link>
           ))}

@@ -1,15 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Star, ArrowRight } from "lucide-react";
 import { REVIEWS } from "@/data/content";
+import { getDjangoBaseUrl } from "@/lib/api";
 
 export function MovingReviews() {
   const [isPaused, setIsPaused] = useState(false);
+  const [reviewsList, setReviewsList] = useState(REVIEWS);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadReviews() {
+      try {
+        const baseUrl = getDjangoBaseUrl();
+        const res = await fetch(`${baseUrl}/api/reviews/?approved=true`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0 && isMounted) {
+            setReviewsList(
+              data.map((r: any) => ({
+                id: String(r.id),
+                quote: r.quote,
+                rating: r.rating || 5,
+                clientName: r.client_name,
+                projectType: r.project_type,
+                location: r.location || "",
+                year: r.year || "",
+              }))
+            );
+          }
+        }
+      } catch {
+        // fallback to static REVIEWS
+      }
+    }
+    loadReviews();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Duplicate reviews array to create an infinite, seamless loop
-  const marqueeReviews = [...REVIEWS, ...REVIEWS];
+  const marqueeReviews = [...reviewsList, ...reviewsList];
 
   return (
     <section className="py-12 sm:py-18 lg:py-20 bg-[#F7F5F0] border-b border-[#ECE7DF] overflow-hidden">
@@ -42,7 +76,7 @@ export function MovingReviews() {
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setIsPaused(false)}
       >
-        {/* Soft edge masking gradients for editorial continuity */}
+        {/* Soft edge masking gradients */}
         <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-16 z-10 bg-gradient-to-r from-[#F7F5F0] to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-16 z-10 bg-gradient-to-l from-[#F7F5F0] to-transparent pointer-events-none" />
 

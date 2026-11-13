@@ -8,10 +8,44 @@ import { PRODUCTS, BRAND } from "@/data/content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductOrderSection } from "@/components/ProductOrderSection";
+import { getDjangoBaseUrl } from "@/lib/api";
+import { ProductItem } from "@/types";
 import { SITE_URL } from "@/lib/site";
+
+export const dynamicParams = true;
+export const revalidate = 30;
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
+}
+
+async function fetchProduct(slug: string): Promise<ProductItem | null> {
+  try {
+    const baseUrl = getDjangoBaseUrl();
+    const res = await fetch(`${baseUrl}/api/products/${slug}/`, { next: { revalidate: 30 } });
+    if (res.ok) {
+      const p = await res.json();
+      return {
+        id: String(p.id),
+        slug: p.slug,
+        name: p.name,
+        category: p.category,
+        price: p.price,
+        numericPrice: p.numeric_price,
+        image: p.image,
+        imageAlt: p.image_alt || p.name,
+        dimensions: p.dimensions || "Dimensions upon inquiry",
+        material: p.material || "Crafted Material",
+        description: p.description || "",
+        featured: p.featured,
+        available: p.available,
+        createdAt: p.created_at,
+      };
+    }
+  } catch {
+    // fallback
+  }
+  return PRODUCTS.find((p) => p.slug === slug) || null;
 }
 
 export async function generateStaticParams() {
@@ -24,7 +58,7 @@ export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = PRODUCTS.find((p) => p.slug === slug);
+  const product = await fetchProduct(slug);
 
   if (!product) {
     return {
@@ -32,7 +66,7 @@ export async function generateMetadata({
     };
   }
 
-  const metaDescription = `${product.name} — ${product.description}`;
+  const metaDescription = `${product.name} — ${product.description || "Limited edition architectural furnishing by DESIGN TEMPTATION."}`;
 
   return {
     title: product.name,
@@ -64,7 +98,7 @@ export async function generateMetadata({
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = PRODUCTS.find((p) => p.slug === slug);
+  const product = await fetchProduct(slug);
 
   if (!product) {
     notFound();
@@ -84,7 +118,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     },
     offers: {
       "@type": "Offer",
-      price: product.numericPrice,
+      price: product.numericPrice || 0,
       priceCurrency: "INR",
       url: `${SITE_URL}/products/${product.slug}`,
     },
