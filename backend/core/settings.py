@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # Local apps
+    'core.apps.CoreConfig',
     'accounts.apps.AccountsConfig',
     'enquiries.apps.EnquiriesConfig',
     'projects.apps.ProjectsConfig',
